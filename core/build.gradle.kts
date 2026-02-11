@@ -5,8 +5,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
 
-    // Serialization
-    kotlin("plugin.serialization") version "2.0.10"
+    // Kotlinx Serialization
+    alias(libs.plugins.kotlinxSerialization)
+
 }
 
 android {
