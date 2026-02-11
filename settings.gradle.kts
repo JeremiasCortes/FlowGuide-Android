@@ -24,3 +24,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FlowGuide"
 include(":app")
+include(":core")
