@@ -82,4 +82,7 @@ dependencies {
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
+
+    // Lottie
+    implementation("com.airbnb.android:lottie-compose:6.7.1")
 }
