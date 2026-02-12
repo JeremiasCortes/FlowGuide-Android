@@ -6,14 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.navigation.compose.rememberNavController
-import com.jeremiascortes.flowguide.navigation.FlowGuideNavHost
+import com.jeremiascortes.flowguide.navigation.Navigation
 import com.jeremiascortes.flowguide.ui.theme.FlowGuideTheme
 
 class MainActivity : ComponentActivity() {
@@ -24,8 +19,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             FlowGuideTheme {
                 Scaffold(modifier = Modifier.fillMaxSize()) {
-                    val navController = rememberNavController()
-                    FlowGuideNavHost(navController = navController)
+                    Navigation()
                 }
             }
         }
