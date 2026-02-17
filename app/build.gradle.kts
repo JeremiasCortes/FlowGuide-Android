@@ -75,10 +75,12 @@ dependencies {
 
     // Ktor
     implementation("io.ktor:ktor-client-core:3.4.0")
+    implementation("io.ktor:ktor-client-okhttp:3.4.0")
 
     // Navigation
     implementation(libs.navigation.compose)
     implementation(libs.androidx.navigation3.ui)
+    implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
     // Serialization
     implementation(libs.kotlinx.serialization.json)
