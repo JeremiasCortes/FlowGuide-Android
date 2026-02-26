@@ -4,6 +4,26 @@
 
 ---
 
+## [26-02-2026] - v0.2.0
+
+### Added
+- Feature completa de Home con navegación jerárquica Spaces → Folders → Procedures
+- HomeViewModel con gestión de estado usando StateFlow
+- Casos de uso para obtener spaces, folders, procedures y steps desde Supabase
+- Componentes de UI: SpaceTabs, SpaceChip, FolderList, FolderItem, ProcedureItem
+- Animación de expandir/colapsar en carpetas
+- Estados vacíos para carpetas sin procedimientos
+- Repositorio HomeRepository con implementación en Supabase
+- DTOs para Space, Folder, Procedure y Step con serialización correcta (snake_case)
+- Módulo Hilt HomeModule para inyección de dependencias
+
+### Changed
+- Migración de tabla procedures en Supabase de bigint a UUID
+- HomeScreen reorganizada a carpeta presentation/screen
+- Navegación actualizada para soportar la nueva estructura de Home
+
+---
+
 ## [17-02-2026] - v0.1.0
 
 ### Added

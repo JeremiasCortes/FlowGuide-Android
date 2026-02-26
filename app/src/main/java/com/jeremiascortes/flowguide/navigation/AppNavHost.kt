@@ -42,7 +42,8 @@ import androidx.navigation.compose.rememberNavController
 import com.jeremiascortes.flowguide.features.auth.presentation.AuthViewModel
 import com.jeremiascortes.flowguide.features.auth.presentation.LoginScreen
 import com.jeremiascortes.flowguide.features.auth.presentation.RegisterScreen
-import com.jeremiascortes.flowguide.features.home.presentation.HomeScreen
+import com.jeremiascortes.flowguide.features.home.presentation.screen.HomeScreen
+import com.jeremiascortes.flowguide.features.home.presentation.viewmodel.HomeViewModel
 import com.jeremiascortes.flowguide.features.welcome.presentation.SplashScreen
 
 @Composable
@@ -126,9 +127,10 @@ fun Navigation() {
         // ==================== MAIN FLOW ====================
 
         composable<AppRoute.Main.Home> {
-            val viewModel: AuthViewModel = hiltViewModel()
+            val viewModel: HomeViewModel = hiltViewModel()
+
             HomeScreen(
-                viewModel = viewModel,
+                homeViewModel = viewModel,
                 onNavigateToSplash = {
                     navController.navigate(AppRoute.Auth.Splash) {
                         popUpTo(AppRoute.Main.Home) { inclusive = true }
