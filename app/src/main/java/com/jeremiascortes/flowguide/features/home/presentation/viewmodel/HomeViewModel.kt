@@ -82,10 +82,6 @@ class HomeViewModel @Inject constructor(
                         "JACC",
                         "Espacios cargados satisfactoriamente: ${result.data.size} espacios"
                     )
-                    if (_state.value.selectedSpaceId != null) {
-                        loadProcedures(_state.value.selectedSpaceId!!)
-                        Log.d("JACC", "Cargando procedimientos para el espacio seleccionado ${_state.value.selectedSpaceId}")
-                    }
                 }
 
                 is HomeResult.Error -> {
@@ -104,7 +100,7 @@ class HomeViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
 
             when (val result = getAllProceduresByIdSpaceUseCase(idSpace)) {
-                is HomeResult.Loading -> { }
+                is HomeResult.Loading -> {}
 
                 is HomeResult.Success -> {
                     _state.value = _state.value.copy(
@@ -113,7 +109,7 @@ class HomeViewModel @Inject constructor(
                     )
                     Log.i(
                         "JACC",
-                        "Procedimientos cargados satisfactoriamente: ${result.data.size} procedimientos"
+                        "Procedimientos cargados satisfactoriamente al entrar a un espacio: ${result.data.size} procedimientos"
                     )
                 }
 
@@ -158,9 +154,10 @@ class HomeViewModel @Inject constructor(
                         )
                         Log.i(
                             "JACC",
-                            "Procedimientos cargados satisfactoriamente: ${result.data.size} procedimientos"
+                            "Procedimientos cargados satisfactoriamente de la carpeta: ${result.data.size} procedimientos"
                         )
                     }
+
                     is HomeResult.Error -> {}
                 }
             }

@@ -31,9 +31,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.navigation3.runtime.NavKey
 import com.jeremiascortes.flowguide.features.home.presentation.components.common.EmptyFolderState
 import com.jeremiascortes.flowguide.features.home.presentation.components.folder.FolderList
+import com.jeremiascortes.flowguide.features.home.presentation.components.folder.ProcedureItem
 import com.jeremiascortes.flowguide.features.home.presentation.components.space.SpaceTabs
 import com.jeremiascortes.flowguide.features.home.presentation.viewmodel.HomeViewModel
 import kotlinx.serialization.Serializable
@@ -65,8 +67,21 @@ fun HomeScreen(
             SpaceTabs(
                 spaces = state.spaces,
                 selectedSpaceId = state.selectedSpaceId,
-                onSpaceSelected = { id -> homeViewModel.selectSpace(id) }
+                onSpaceSelected = { id ->
+                    homeViewModel.selectSpace(id)
+                    homeViewModel.loadProcedures(id)
+                }
             )
+
+            if (state.orphanProceduresBySpace.isNotEmpty()) {
+                Column(modifier = Modifier.padding(start = 32.dp)) {
+                    val procedures = state.orphanProceduresBySpace[state.selectedSpaceId] ?: emptyList()
+
+                    procedures.forEach { procedure ->
+                        ProcedureItem(procedure = procedure)
+                    }
+                }
+            }
 
             if (state.error != null) {
                 Text("Ocurrió un error al cargar los espacios. \n ${state.error}")
@@ -81,7 +96,7 @@ fun HomeScreen(
                         homeViewModel.toggleFolder(folderId)
                     }
                 )
-            } else if (state.selectedSpaceId != null && !state.isLoading) {
+            } else if (state.selectedSpaceId != null && !state.isLoading && state.orphanProceduresBySpace.isEmpty()) {
                 EmptyFolderState()
             }
         }
