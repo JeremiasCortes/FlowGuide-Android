@@ -73,16 +73,6 @@ fun HomeScreen(
                 }
             )
 
-            if (state.orphanProceduresBySpace.isNotEmpty()) {
-                Column(modifier = Modifier.padding(start = 32.dp)) {
-                    val procedures = state.orphanProceduresBySpace[state.selectedSpaceId] ?: emptyList()
-
-                    procedures.forEach { procedure ->
-                        ProcedureItem(procedure = procedure)
-                    }
-                }
-            }
-
             if (state.error != null) {
                 Text("Ocurrió un error al cargar los espacios. \n ${state.error}")
             }
