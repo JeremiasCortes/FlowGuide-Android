@@ -4,6 +4,27 @@
 
 ---
 
+## [Unreleased] - v0.3.0
+
+### Added
+- Feature completa de visualización y gestión de procedimientos (Procedure)
+- ProcedureScreen con diseño basado en tarjetas para los pasos (steps)
+- Sistema de Checkbox de árbol (TreeCheckbox) para completar pasos
+- Casos de uso: GetProcedureWithStepsUseCase y UpdateStepCompletion
+- Repositorio ProcedureRepository con implementación para Supabase
+- Módulo Hilt ProcedureModule para inyección de dependencias
+- UI: AutoCollapsableTopAppBar para una barra de navegación dinámica
+
+### Changed
+- Reorganización de modelos de Home a Procedure (HomeResult → ProcedureResult, etc.)
+- Navegación actualizada para incluir la ruta a ProcedureScreen pasando el procedureId
+- Mejoras generales en la interfaz de usuario de las carpetas y tareas
+
+### Removed
+- Visualización de las tareas huérfanas. Las tareas siempre estarán dentro de una carpeta
+
+---
+
 ## [26-02-2026] - v0.2.0
 
 ### Added

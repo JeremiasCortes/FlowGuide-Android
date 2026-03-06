@@ -1,4 +1,4 @@
-package com.jeremiascortes.flowguide.features.home.model
+package com.jeremiascortes.flowguide.features.home.domain.model
 
 sealed class HomeResult<out T> {
     data object Loading : HomeResult<Nothing>()

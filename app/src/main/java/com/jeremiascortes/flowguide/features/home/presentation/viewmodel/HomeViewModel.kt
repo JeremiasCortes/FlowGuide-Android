@@ -26,7 +26,6 @@ package com.jeremiascortes.flowguide.features.home.presentation.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jeremiascortes.flowguide.features.home.data.model.FolderDto
 import com.jeremiascortes.flowguide.features.home.domain.model.HomeState
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllFoldersByIdSpaceUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdFolderUseCase
@@ -34,7 +33,7 @@ import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProcedure
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllSpacesUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllStepsByIdProcedureUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.LogoutUseCase
-import com.jeremiascortes.flowguide.features.home.model.HomeResult
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -63,7 +62,6 @@ class HomeViewModel @Inject constructor(
     init {
         // Cargar los espacios al iniciar el ViewModel
         loadSpaces()
-
     }
 
     fun loadSpaces() {
@@ -178,7 +176,8 @@ class HomeViewModel @Inject constructor(
                 selectedFolderId = null,
                 selectedProcedureId = null,
                 folders = emptyList(),
-                proceduresByFolder = emptyMap()
+                proceduresByFolder = emptyMap(),
+                expandedFolderIds = emptySet()
             )
 
             // Cargar carpetas del espacio seleccionado
@@ -205,40 +204,6 @@ class HomeViewModel @Inject constructor(
                         error = result.message
                     )
                     Log.e("JACC", "Error al cargar carpetas: ${result.message}")
-                }
-            }
-        }
-    }
-
-    /**
-     * Selecciona una carpeta y carga sus procedimientos.
-     */
-    fun selectFolder(folderId: String) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(
-                selectedFolderId = folderId,
-                selectedProcedureId = null,
-                proceduresByFolder = emptyMap()
-            )
-
-            when (val result = getAllProceduresByIdFolderUseCase(folderId)) {
-                is HomeResult.Loading -> {
-                    _state.value = _state.value.copy(isLoading = true)
-                }
-
-                is HomeResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        proceduresByFolder = mapOf(folderId to result.data),
-                        error = null
-                    )
-                }
-
-                is HomeResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = result.message
-                    )
                 }
             }
         }

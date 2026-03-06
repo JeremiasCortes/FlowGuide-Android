@@ -17,7 +17,8 @@ fun FolderList(
     folders: List<FolderDto>,
     expandedFolderIds: Set<String>,
     proceduresByFolder: Map<String, List<ProcedureDto>>,
-    onToggleFolder: (String) -> Unit
+    onToggleFolder: (String) -> Unit,
+    onNavigateToProcedure: (String) -> Unit
 ) {
     // LazyColumn es el equivalente a RecyclerView, ideal para listas largas
     LazyColumn(
@@ -35,7 +36,8 @@ fun FolderList(
                 folder = folder,
                 isExpanded = isExpanded,
                 procedures = procedures,
-                onToggle = { onToggleFolder(folder.idFolder) }
+                onToggle = { onToggleFolder(folder.idFolder) },
+                onNavigateToProcedure = onNavigateToProcedure
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
         }

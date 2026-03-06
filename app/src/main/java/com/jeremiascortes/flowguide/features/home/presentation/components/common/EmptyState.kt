@@ -18,7 +18,7 @@ fun EmptyFolderState() {
         contentAlignment = Alignment.Center
     ) {
         Text(
-            text = "No hay carpetas disponibles en este espacio",
+            text = "No hay carpetas ni tareas disponibles en este espacio",
             style = androidx.compose.material3.MaterialTheme.typography.bodyLarge,
             color = androidx.compose.material3.MaterialTheme.colorScheme.onSurfaceVariant
         )

@@ -30,6 +30,11 @@ sealed class AppRoute {
         data object Home : Main()
 
         @Serializable
+        data class Procedure(
+            val procedureId: String
+        ) : Main()
+
+        @Serializable
         data object Profile : Main()
 
         @Serializable

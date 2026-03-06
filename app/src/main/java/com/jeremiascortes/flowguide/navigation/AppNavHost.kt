@@ -42,8 +42,10 @@ import androidx.navigation.compose.rememberNavController
 import com.jeremiascortes.flowguide.features.auth.presentation.AuthViewModel
 import com.jeremiascortes.flowguide.features.auth.presentation.LoginScreen
 import com.jeremiascortes.flowguide.features.auth.presentation.RegisterScreen
-import com.jeremiascortes.flowguide.features.home.presentation.screen.HomeScreen
+import com.jeremiascortes.flowguide.features.home.presentation.screens.HomeScreen
 import com.jeremiascortes.flowguide.features.home.presentation.viewmodel.HomeViewModel
+import com.jeremiascortes.flowguide.features.procedure.presentation.screens.ProcedureScreen
+import com.jeremiascortes.flowguide.features.procedure.presentation.viewmodel.ProcedureViewModel
 import com.jeremiascortes.flowguide.features.welcome.presentation.SplashScreen
 
 @Composable
@@ -127,15 +129,21 @@ fun Navigation() {
         // ==================== MAIN FLOW ====================
 
         composable<AppRoute.Main.Home> {
-            val viewModel: HomeViewModel = hiltViewModel()
+            val homeViewModel: HomeViewModel = hiltViewModel()
 
             HomeScreen(
-                homeViewModel = viewModel,
-                onNavigateToSplash = {
-                    navController.navigate(AppRoute.Auth.Splash) {
-                        popUpTo(AppRoute.Main.Home) { inclusive = true }
-                    }
+                homeViewModel = homeViewModel,
+                onNavigateToProcedure = { idProcedure ->
+                    navController.navigate(AppRoute.Main.Procedure(idProcedure)) {}
                 }
+            )
+        }
+
+        composable<AppRoute.Main.Procedure> {
+            val viewModel: ProcedureViewModel = hiltViewModel()
+            ProcedureScreen(
+                procedureViewModel = viewModel,
+                onBack = { navController.popBackStack() }
             )
         }
     }

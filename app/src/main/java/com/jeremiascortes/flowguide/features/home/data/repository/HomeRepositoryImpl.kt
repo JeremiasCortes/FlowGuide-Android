@@ -6,10 +6,9 @@ import com.jeremiascortes.flowguide.features.home.data.model.FolderDto
 import com.jeremiascortes.flowguide.features.home.data.model.ProcedureDto
 import com.jeremiascortes.flowguide.features.home.data.model.SpaceDto
 import com.jeremiascortes.flowguide.features.home.data.model.StepDto
-import com.jeremiascortes.flowguide.features.home.domain.model.Step
 import com.jeremiascortes.flowguide.features.home.domain.repository.HomeRepository
-import com.jeremiascortes.flowguide.features.home.model.HomeResult
-import com.jeremiascortes.flowguide.features.home.model.HomeResult.Success
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult.Success
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import javax.inject.Inject

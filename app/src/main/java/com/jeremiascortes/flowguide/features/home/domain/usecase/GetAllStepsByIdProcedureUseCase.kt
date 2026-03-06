@@ -2,7 +2,7 @@ package com.jeremiascortes.flowguide.features.home.domain.usecase
 
 import com.jeremiascortes.flowguide.features.home.data.model.StepDto
 import com.jeremiascortes.flowguide.features.home.domain.repository.HomeRepository
-import com.jeremiascortes.flowguide.features.home.model.HomeResult
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 import jakarta.inject.Inject
 
 class GetAllStepsByIdProcedureUseCase @Inject constructor(

@@ -38,7 +38,8 @@ fun FolderItem(
     folder: FolderDto,
     isExpanded: Boolean,
     procedures: List<ProcedureDto>,
-    onToggle: () -> Unit
+    onToggle: () -> Unit,
+    onNavigateToProcedure: (String) -> Unit
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -115,7 +116,12 @@ fun FolderItem(
                         )
                     } else {
                         procedures.forEach { procedure ->
-                            ProcedureItem(procedure = procedure)
+                            ProcedureItem(
+                                procedure = procedure,
+                                onClick = {
+                                    onNavigateToProcedure(procedure.idProcedure)
+                                }
+                            )
                         }
                     }
                 }

@@ -4,7 +4,7 @@ import com.jeremiascortes.flowguide.features.home.data.model.FolderDto
 import com.jeremiascortes.flowguide.features.home.data.model.ProcedureDto
 import com.jeremiascortes.flowguide.features.home.data.model.SpaceDto
 import com.jeremiascortes.flowguide.features.home.data.model.StepDto
-import com.jeremiascortes.flowguide.features.home.model.HomeResult
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 
 interface HomeRepository {
     suspend fun logout(): HomeResult<Unit>
