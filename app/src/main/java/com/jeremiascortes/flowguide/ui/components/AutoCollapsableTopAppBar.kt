@@ -93,23 +93,7 @@ fun AutoCollapsableTopAppBar(
                         }
                     }
                 },
-                actions = {
-                    TooltipBox(
-                        positionProvider =
-                            TooltipDefaults.rememberTooltipPositionProvider(
-                                TooltipAnchorPosition.Above
-                            ),
-                        tooltip = { PlainTooltip { Text("Add to favorites") } },
-                        state = rememberTooltipState(),
-                    ) {
-                        IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(
-                                imageVector = Icons.Filled.Favorite,
-                                contentDescription = "Add to favorites",
-                            )
-                        }
-                    }
-                },
+                actions = { },
                 scrollBehavior = scrollBehavior,
             )
         },
