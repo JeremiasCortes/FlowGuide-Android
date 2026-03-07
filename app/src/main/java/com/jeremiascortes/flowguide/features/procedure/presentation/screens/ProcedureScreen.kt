@@ -1,6 +1,5 @@
 package com.jeremiascortes.flowguide.features.procedure.presentation.screens
 
-import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,11 +28,9 @@ fun ProcedureScreen(
 
     AutoCollapsableTopAppBar(
         title = {
-            Log.d("JACC", "Nombre del procedimiento: ${state.value.procedure?.name}")
             Text(state.value.procedure?.name ?: "")
         }
     ) {
-        Log.d("JACC", "Pasos: ${stepsList.size}")
         itemsIndexed(stepsList) { index, step ->
             Card(
                 modifier = Modifier

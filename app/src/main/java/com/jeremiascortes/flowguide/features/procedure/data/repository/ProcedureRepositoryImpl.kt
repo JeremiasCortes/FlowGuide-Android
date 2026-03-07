@@ -1,6 +1,5 @@
 package com.jeremiascortes.flowguide.features.procedure.data.repository
 
-import android.util.Log
 import com.jeremiascortes.flowguide.features.auth.di.SupabaseClient
 import com.jeremiascortes.flowguide.features.procedure.data.model.ProcedureDto
 import com.jeremiascortes.flowguide.features.procedure.data.model.StepDto
@@ -39,11 +38,8 @@ class ProcedureRepositoryImpl @Inject constructor(
                     }
                 }
                 .decodeList<StepDto>()
-            Log.d("JACC", "Lista de steps cargados: ${stepsDto.size}")
-            Log.d("JACC", "El nombre del procedimientoDto es: ${procedureDto.name}")
             val steps = stepsDto.map { it.toDomain() }
             val procedure = procedureDto.toDomain(steps)
-            Log.d("JACC", "El nombre del procedimiento es: ${procedure.name}")
 
 
             Result.success(procedure)

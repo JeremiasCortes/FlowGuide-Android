@@ -23,9 +23,9 @@ package com.jeremiascortes.flowguide.features.home.presentation.viewmodel
  * ============================================================================
  */
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 import com.jeremiascortes.flowguide.features.home.domain.model.HomeState
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllFoldersByIdSpaceUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdFolderUseCase
@@ -33,7 +33,6 @@ import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProcedure
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllSpacesUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllStepsByIdProcedureUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.LogoutUseCase
-import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -76,10 +75,6 @@ class HomeViewModel @Inject constructor(
                         isLoading = false,
                         spaces = result.data
                     )
-                    Log.i(
-                        "JACC",
-                        "Espacios cargados satisfactoriamente: ${result.data.size} espacios"
-                    )
                 }
 
                 is HomeResult.Error -> {
@@ -87,7 +82,6 @@ class HomeViewModel @Inject constructor(
                         isLoading = false,
                         error = result.message
                     )
-                    Log.e("JACC", "Error al cargar espacios: ${result.message}")
                 }
             }
         }
@@ -105,10 +99,6 @@ class HomeViewModel @Inject constructor(
                         isLoading = false,
                         orphanProceduresBySpace = mapOf(idSpace to result.data)
                     )
-                    Log.i(
-                        "JACC",
-                        "Procedimientos cargados satisfactoriamente al entrar a un espacio: ${result.data.size} procedimientos"
-                    )
                 }
 
                 is HomeResult.Error -> {
@@ -116,7 +106,6 @@ class HomeViewModel @Inject constructor(
                         isLoading = false,
                         error = result.message
                     )
-                    Log.e("JACC", "Error al cargar procedimientos: ${result.message}")
                 }
             }
 
@@ -150,10 +139,6 @@ class HomeViewModel @Inject constructor(
                         _state.value = _state.value.copy(
                             proceduresByFolder = _state.value.proceduresByFolder + (folderId to result.data)
                         )
-                        Log.i(
-                            "JACC",
-                            "Procedimientos cargados satisfactoriamente de la carpeta: ${result.data.size} procedimientos"
-                        )
                     }
 
                     is HomeResult.Error -> {}
@@ -167,7 +152,6 @@ class HomeViewModel @Inject constructor(
      */
     fun selectSpace(spaceId: String) {
         viewModelScope.launch {
-            Log.d("JACC", "Seleccionando espacio con ID: $spaceId")
             // Actualizar el ID seleccionado
             _state.value = _state.value.copy(
                 isLoading = true,
@@ -192,10 +176,6 @@ class HomeViewModel @Inject constructor(
                         folders = result.data,
                         error = null
                     )
-                    Log.i(
-                        "JACC",
-                        "Carpetas cargadas satisfactoriamente: ${result.data.size} carpetas"
-                    )
                 }
 
                 is HomeResult.Error -> {
@@ -203,7 +183,6 @@ class HomeViewModel @Inject constructor(
                         isLoading = false,
                         error = result.message
                     )
-                    Log.e("JACC", "Error al cargar carpetas: ${result.message}")
                 }
             }
         }

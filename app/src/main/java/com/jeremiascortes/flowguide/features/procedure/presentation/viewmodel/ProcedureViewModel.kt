@@ -1,6 +1,5 @@
 package com.jeremiascortes.flowguide.features.procedure.presentation.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -27,7 +26,6 @@ class ProcedureViewModel @Inject constructor(
     val state: StateFlow<ProcedureState> = _state.asStateFlow()
 
     init {
-        Log.d("JACC", "El procedureId es: $procedureId")
         if (procedureId.isNotEmpty()) {
             loadProcedure(procedureId)
         }
@@ -48,7 +46,6 @@ class ProcedureViewModel @Inject constructor(
                     isLoading = false,
                     error = exception.message
                 )
-                Log.e("JACC", "Error al cargar el procedimiento: ${exception.message}")
             }
         }
     }

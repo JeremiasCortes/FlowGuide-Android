@@ -1,14 +1,13 @@
 package com.jeremiascortes.flowguide.features.home.data.repository
 
-import android.util.Log
 import com.jeremiascortes.flowguide.features.auth.di.SupabaseClient
 import com.jeremiascortes.flowguide.features.home.data.model.FolderDto
 import com.jeremiascortes.flowguide.features.home.data.model.ProcedureDto
 import com.jeremiascortes.flowguide.features.home.data.model.SpaceDto
 import com.jeremiascortes.flowguide.features.home.data.model.StepDto
-import com.jeremiascortes.flowguide.features.home.domain.repository.HomeRepository
 import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult.Success
+import com.jeremiascortes.flowguide.features.home.domain.repository.HomeRepository
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.postgrest.from
 import javax.inject.Inject
@@ -230,7 +229,6 @@ class HomeRepositoryImpl @Inject constructor(
 
             Success(procedures)
         } catch (e: Exception) {
-            Log.d("JACC", "Error al obtener procedimientos: ${e.message ?: "Error desconocido"}")
             HomeResult.Error("Error al obtener procedimientos: ${e.message ?: "Error desconocido"}")
         }
     }
