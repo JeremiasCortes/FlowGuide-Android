@@ -4,7 +4,14 @@
 
 ---
 
-## [Unreleased] - v0.3.0
+## [Unreleased] - v0.4.0
+
+### Removed
+- Logs en toda la aplicación
+
+---
+
+## [06-03-2026] - v0.3.0
 
 ### Added
 - Feature completa de visualización y gestión de procedimientos (Procedure)
