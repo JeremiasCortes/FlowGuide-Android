@@ -29,7 +29,8 @@ fun ProcedureScreen(
     AutoCollapsableTopAppBar(
         title = {
             Text(state.value.procedure?.name ?: "")
-        }
+        },
+        onBack = onBack
     ) {
         itemsIndexed(stepsList) { index, step ->
             Card(

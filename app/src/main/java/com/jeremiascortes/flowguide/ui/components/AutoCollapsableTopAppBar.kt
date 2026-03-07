@@ -5,14 +5,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Menu
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +43,8 @@ import com.jeremiascortes.flowguide.ui.theme.FlowGuideTheme
 @Composable
 fun AutoCollapsableTopAppBar(
     title: @Composable () -> Unit,
-    content: LazyListScope.() -> Unit,
+    onBack: () -> Unit = {},
+    content: LazyListScope.() -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
     val lazyListState = rememberLazyListState()
@@ -85,11 +83,11 @@ fun AutoCollapsableTopAppBar(
                             TooltipDefaults.rememberTooltipPositionProvider(
                                 TooltipAnchorPosition.Above
                             ),
-                        tooltip = { PlainTooltip { Text("Menu") } },
+                        tooltip = { PlainTooltip { Text("Volver a la Pantalla Principal") } },
                         state = rememberTooltipState(),
                     ) {
-                        IconButton(onClick = { /* doSomething() */ }) {
-                            Icon(imageVector = Icons.Filled.Menu, contentDescription = "Menu")
+                        IconButton(onClick = onBack) {
+                            Icon(imageVector = Icons.Default.ArrowBack, contentDescription = "Menu")
                         }
                     }
                 },
