@@ -6,6 +6,9 @@
 
 ## [Unreleased] - v0.4.0
 
+### Changed
+- Refactorización de la barra de navegación AutoCollapsableTopAppBar
+
 ### Removed
 - Logs en toda la aplicación
 
