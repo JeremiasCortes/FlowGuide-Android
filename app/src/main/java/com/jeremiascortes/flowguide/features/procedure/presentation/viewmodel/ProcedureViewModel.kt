@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jeremiascortes.flowguide.features.procedure.domain.model.CheckboxNode
+import com.jeremiascortes.flowguide.features.procedure.domain.model.Procedure
 import com.jeremiascortes.flowguide.features.procedure.domain.model.ProcedureState
 import com.jeremiascortes.flowguide.features.procedure.domain.model.Step
 import com.jeremiascortes.flowguide.features.procedure.domain.usecase.GetProcedureWithStepsUseCase
@@ -17,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ProcedureViewModel @Inject constructor(
-    private val savedStateHandle: SavedStateHandle,
+    savedStateHandle: SavedStateHandle,
     private val getProcedureWithStepsUseCase: GetProcedureWithStepsUseCase,
     private val toggleStepCompletionUseCase: UpdateStepCompletion
 ) : ViewModel() {
@@ -29,6 +30,24 @@ class ProcedureViewModel @Inject constructor(
         if (procedureId.isNotEmpty()) {
             loadProcedure(procedureId)
         }
+    }
+
+    /**
+     * Ejecuta un bloque suspendido solo si actualmente hay un procedimiento cargado.
+     *
+     * Esta helper evita repetir el mismo null-check sobre `_state.value.procedure`
+     * en varios métodos del ViewModel.
+     *
+     * Beneficios:
+     * - Reduce código duplicado
+     * - Hace más legible la intención del método
+     * - Garantiza que dentro del bloque `procedure` nunca es null
+     *
+     * Si no hay procedimiento cargado, la función termina sin hacer nada.
+     */
+    private suspend fun withProcedure(block: suspend (procedure: Procedure) -> Unit) {
+        val procedure = _state.value.procedure ?: return
+        block(procedure)
     }
 
     fun loadProcedure(idProcedure: String) {
@@ -50,6 +69,11 @@ class ProcedureViewModel @Inject constructor(
         }
     }
 
+    // Método para establecer el estado loading
+    fun setLoading(isLoading: Boolean) {
+        _state.value = _state.value.copy(isLoading = isLoading)
+    }
+
     private fun Step.toCheckboxNode(index: Int): CheckboxNode {
         return CheckboxNode(
             id = index, // 1, 2, 3, 4...
@@ -62,22 +86,44 @@ class ProcedureViewModel @Inject constructor(
 
     fun toggleStepCompletion(stepId: String, newValue: Boolean) {
         viewModelScope.launch {
-            // Primero actualizamos el estado local para que la UI responda rápido
-            val currentProcedure = _state.value.procedure ?: return@launch
-            val updatedSteps = currentProcedure.steps.map { step ->
-                if (step.id == stepId) {
-                    step.copy(isCompleted = newValue)
-                } else {
-                    step
+            withProcedure { currentProcedure ->
+                setLoading(true)
+
+                val updatedSteps = currentProcedure.steps.map { step ->
+                    if (step.id == stepId) step.copy(isCompleted = newValue) else step
                 }
+
+                _state.value = _state.value.copy(
+                    procedure = currentProcedure.copy(steps = updatedSteps)
+                )
+
+                setLoading(false)
+
+                toggleStepCompletionUseCase(stepId, newValue)
             }
+        }
+    }
 
-            _state.value = _state.value.copy(
-                isLoading = true,
-                procedure = currentProcedure.copy(steps = updatedSteps)
-            )
+    fun resetAllStepsCompletion() {
+        viewModelScope.launch {
+            withProcedure { currentProcedure ->
+                setLoading(true)
 
-            toggleStepCompletionUseCase(stepId, newValue)
+                val updatedSteps = currentProcedure.steps.map { step ->
+                    step.copy(isCompleted = false)
+                }
+
+                _state.value = _state.value.copy(
+                    procedure = currentProcedure.copy(steps = updatedSteps)
+                )
+
+                setLoading(false)
+
+                updatedSteps.forEach { step ->
+                    toggleStepCompletionUseCase(step.id, false)
+                }
+
+            }
         }
     }
 }
