@@ -1,6 +1,7 @@
 package com.jeremiascortes.flowguide.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -44,6 +45,7 @@ import com.jeremiascortes.flowguide.ui.theme.FlowGuideTheme
 fun AutoCollapsableTopAppBar(
     title: @Composable () -> Unit,
     onBack: () -> Unit = {},
+    actions: @Composable RowScope.() -> Unit = {},
     content: LazyListScope.() -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior()
@@ -91,7 +93,7 @@ fun AutoCollapsableTopAppBar(
                         }
                     }
                 },
-                actions = { },
+                actions = actions,
                 scrollBehavior = scrollBehavior,
             )
         },
