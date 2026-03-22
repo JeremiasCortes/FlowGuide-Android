@@ -40,10 +40,18 @@ import com.jeremiascortes.flowguide.features.auth.domain.usecase.RegisterUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.SignInWithGoogleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import jakarta.inject.Inject
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+
+// Dentro del mismo archivo o en un archivo separado
+sealed class NavigationEvent {
+    data object ToHome : NavigationEvent()
+    data object ToLogin : NavigationEvent()
+}
 
 @HiltViewModel
 class AuthViewModel @Inject constructor(
@@ -61,6 +69,10 @@ class AuthViewModel @Inject constructor(
     // Resultado de la última operación: Success, Error, Loading
     private val _authResult = MutableStateFlow<AuthResult<Unit>?>(null)
     val authResult: StateFlow<AuthResult<Unit>?> = _authResult.asStateFlow()
+
+    // Canal de eventos de navegación - garantiza entrega aunque el receptor llegue tarde
+    private val _navigationEvent = Channel<NavigationEvent>()
+    val navigationEvent = _navigationEvent.receiveAsFlow()
 
     init {
         // Al crear el ViewModel, verificar si ya hay sesión activa
@@ -86,6 +98,7 @@ class AuthViewModel @Inject constructor(
             _authResult.value = loginUseCase(email, password)
             if (_authResult.value is AuthResult.Success) {
                 checkAuthStatus()
+                _navigationEvent.send(NavigationEvent.ToHome)
             }
         }
     }
@@ -100,6 +113,7 @@ class AuthViewModel @Inject constructor(
             _authResult.value = signInWithGoogleUseCase()
             if (_authResult.value is AuthResult.Success) {
                 checkAuthStatus()
+                _navigationEvent.send(NavigationEvent.ToHome)
             }
         }
     }
@@ -130,14 +144,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             logoutUseCase()
             checkAuthStatus()
+            _navigationEvent.send(NavigationEvent.ToLogin)
         }
-    }
-
-    /**
-     * Limpia el resultado de la última operación.
-     * Útil para ocultar mensajes de error después de mostrarlos.
-     */
-    fun clearResult() {
-        _authResult.value = null
     }
 }

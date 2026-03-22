@@ -1,5 +1,6 @@
-package com.jeremiascortes.flowguide.ui.components
+package com.jeremiascortes.flowguide.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
@@ -30,11 +31,12 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.jeremiascortes.flowguide.ui.theme.FlowGuideTheme
+import com.jeremiascortes.flowguide.presentation.theme.FlowGuideTheme
 
 /**
  * A sample for a [MediumTopAppBar] that collapses when the content is scrolled up, and appears when
@@ -72,12 +74,13 @@ fun AutoCollapsableTopAppBar(
 
     Scaffold(
         modifier = if (canScroll) {
-            Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+            Modifier.nestedScroll(scrollBehavior.nestedScrollConnection).background(Color.Red.copy(alpha = 0.2f))
         } else {
             Modifier
         },
         topBar = {
             MediumTopAppBar(
+                modifier = Modifier.background(Color.Blue.copy(alpha = 0.2f)),
                 title = title,
                 navigationIcon = {
                     TooltipBox(
@@ -103,9 +106,6 @@ fun AutoCollapsableTopAppBar(
                 contentPadding = innerPadding,
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                item {
-                    Spacer(modifier = Modifier.height(16.dp))
-                }
                 content()
             }
         },

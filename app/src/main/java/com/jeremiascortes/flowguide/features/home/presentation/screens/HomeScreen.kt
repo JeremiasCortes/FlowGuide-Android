@@ -17,12 +17,16 @@ import com.jeremiascortes.flowguide.features.home.presentation.viewmodel.HomeVie
 fun HomeScreen(
     homeViewModel: HomeViewModel,
     onNavigateToProcedure: (String) -> Unit,
+    bottomBar: @Composable () -> Unit = {}
 ) {
     val state by homeViewModel.state.collectAsState()
 
-    Scaffold { padding ->
-        Column(modifier = Modifier.padding(padding)) {
-
+    Scaffold(
+        bottomBar = bottomBar
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier.padding(innerPadding),
+        ) {
             // SECCIÓN 1: Spaces (tabs horizontales)
             SpaceTabs(
                 spaces = state.spaces,

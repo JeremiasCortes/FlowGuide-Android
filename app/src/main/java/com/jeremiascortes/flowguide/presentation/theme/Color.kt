@@ -1,4 +1,4 @@
-package com.jeremiascortes.flowguide.ui.theme
+package com.jeremiascortes.flowguide.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

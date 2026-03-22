@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -41,7 +40,6 @@ import androidx.compose.ui.draw.scale
 import com.airbnb.lottie.compose.LottieAnimation
 import com.airbnb.lottie.compose.LottieCompositionSpec
 import com.airbnb.lottie.compose.animateLottieCompositionAsState
-import androidx.compose.runtime.*
 import com.airbnb.lottie.compose.rememberLottieComposition
 import com.jeremiascortes.flowguide.R
 import kotlinx.coroutines.delay
@@ -49,11 +47,13 @@ import kotlinx.coroutines.delay
 /**
  * Pantalla de Splash que muestra una animación de carga.
  *
- * @param onNavigateToHome Callback para navegar a la siguiente pantalla
+ * @param onNavigate Callback para navegar a la siguiente pantalla
  *        después de que termine la animación/tiempo de espera
  */
 @Composable
-fun SplashScreen(onNavigateToHome: () -> Unit) {
+fun SplashScreen(
+    onNavigate: () -> Unit
+) {
     // Animaciones de entrada suaves
     val scale by animateFloatAsState(
         targetValue = 1f,
@@ -70,7 +70,7 @@ fun SplashScreen(onNavigateToHome: () -> Unit) {
     // Efecto para navegar después del tiempo de espera
     LaunchedEffect(Unit) {
         delay(3000) // 3 segundos de splash
-        onNavigateToHome()
+        onNavigate()
     }
 
     Box(

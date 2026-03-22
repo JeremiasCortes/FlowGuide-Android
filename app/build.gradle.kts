@@ -79,7 +79,6 @@ dependencies {
 
     // Navigation
     implementation(libs.navigation.compose)
-    implementation(libs.androidx.navigation3.ui)
     implementation("androidx.hilt:hilt-navigation-compose:1.3.0")
 
     // Serialization

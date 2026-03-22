@@ -6,8 +6,20 @@
 
 ## [Unreleased] - v0.4.0
 
+### Added
+- Feature completa de Settings con arquitectura MVVM + Clean Architecture
+- Pantalla `SettingsScreen` con opción de logout
+- Caso de uso `LogoutUseCase` y repositorio `SettingsRepository`
+- Componente `MainTopBar` reutilizable
+- Componente `BottomBar` con items configurables
+- Eventos de navegación con `Channel` para evitar condiciones de carrera
+
 ### Changed
 - Refactorización de la barra de navegación AutoCollapsableTopAppBar
+- Corrección de condiciones de carrera en login/logout
+
+### Fixed
+- Logout navega a Splash correctamente sin reenvío a Home
 
 ### Removed
 - Logs en toda la aplicación

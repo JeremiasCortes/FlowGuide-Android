@@ -56,7 +56,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jeremiascortes.flowguide.features.auth.domain.model.AuthResult
-import com.jeremiascortes.flowguide.features.auth.domain.model.AuthState
 
 @Composable
 fun LoginScreen(
@@ -72,10 +71,13 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    // Efecto: Si el usuario se autentica, navegar a Home
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Authenticated) {
-            onNavigateToHome()
+    // Efecto: Observar eventos de navegación del ViewModel
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                is NavigationEvent.ToHome -> onNavigateToHome()
+                is NavigationEvent.ToLogin -> { /* No aplica en LoginScreen */ }
+            }
         }
     }
 
