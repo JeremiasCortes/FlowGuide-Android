@@ -4,7 +4,7 @@
 
 ---
 
-## [Unreleased] - v0.5.0
+## [Unreleased] – v0.5.0
 
 ### Added
 - Componente `LoadingIndicator` para indicar el estado de carga
