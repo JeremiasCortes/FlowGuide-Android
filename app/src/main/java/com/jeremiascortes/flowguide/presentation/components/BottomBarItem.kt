@@ -1,4 +1,4 @@
-package com.jeremiascortes.flowguide.presentation.components.BottomBar
+package com.jeremiascortes.flowguide.presentation.components
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

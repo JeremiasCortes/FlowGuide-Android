@@ -57,8 +57,8 @@ import com.jeremiascortes.flowguide.features.procedure.presentation.viewmodel.Pr
 import com.jeremiascortes.flowguide.features.settings.presentation.screen.SettingScreen
 import com.jeremiascortes.flowguide.features.settings.presentation.viewmodel.SettingsViewModel
 import com.jeremiascortes.flowguide.features.welcome.presentation.SplashScreen
-import com.jeremiascortes.flowguide.presentation.components.BottomBar.BottomBar
-import com.jeremiascortes.flowguide.presentation.components.BottomBar.BottomBarItem
+import com.jeremiascortes.flowguide.presentation.components.BottomBar
+import com.jeremiascortes.flowguide.presentation.components.BottomBarItem
 
 @Composable
 fun AppNavHost() {

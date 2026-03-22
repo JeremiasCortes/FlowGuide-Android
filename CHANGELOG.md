@@ -4,7 +4,15 @@
 
 ---
 
-## [Unreleased] - v0.4.0
+## [Unreleased] - v0.5.0
+
+### Added
+- Componente `LoadingIndicator` para indicar el estado de carga
+- Implementación de `LoadingIndicator` en `HomeScreen` para mostrar el estado de carga
+
+---
+
+## [22-03-2026] - v0.4.0
 
 ### Added
 - Feature completa de Settings con arquitectura MVVM + Clean Architecture

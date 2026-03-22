@@ -1,11 +1,5 @@
-package com.jeremiascortes.flowguide.presentation.components.BottomBar
+package com.jeremiascortes.flowguide.presentation.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Mic
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.FloatingActionButton

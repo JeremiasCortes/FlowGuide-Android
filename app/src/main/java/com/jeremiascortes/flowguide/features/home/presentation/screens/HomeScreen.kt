@@ -1,6 +1,8 @@
 package com.jeremiascortes.flowguide.features.home.presentation.screens
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -12,6 +14,7 @@ import com.jeremiascortes.flowguide.features.home.presentation.components.common
 import com.jeremiascortes.flowguide.features.home.presentation.components.folder.FolderList
 import com.jeremiascortes.flowguide.features.home.presentation.components.space.SpaceTabs
 import com.jeremiascortes.flowguide.features.home.presentation.viewmodel.HomeViewModel
+import com.jeremiascortes.flowguide.presentation.components.LoadingIndicator
 
 @Composable
 fun HomeScreen(
@@ -24,36 +27,44 @@ fun HomeScreen(
     Scaffold(
         bottomBar = bottomBar
     ) { innerPadding ->
-        Column(
-            modifier = Modifier.padding(innerPadding),
-        ) {
-            // SECCIÓN 1: Spaces (tabs horizontales)
-            SpaceTabs(
-                spaces = state.spaces,
-                selectedSpaceId = state.selectedSpaceId,
-                onSpaceSelected = { id ->
-                    homeViewModel.selectSpace(id)
-                    homeViewModel.loadProcedures(id)
-                }
-            )
-
-            if (state.error != null) {
-                Text("Ocurrió un error al cargar los espacios. \n ${state.error}")
-            }
-
-            if (state.folders.isNotEmpty()) {
-                FolderList(
-                    folders = state.folders,
-                    expandedFolderIds = state.expandedFolderIds,
-                    proceduresByFolder = state.proceduresByFolder,
-                    onToggleFolder = { folderId ->
-                        homeViewModel.toggleFolder(folderId)
-                    },
-                    onNavigateToProcedure = onNavigateToProcedure
+        Box(
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
+        ){
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                // SECCIÓN 1: Spaces (tabs horizontales)
+                SpaceTabs(
+                    spaces = state.spaces,
+                    selectedSpaceId = state.selectedSpaceId,
+                    onSpaceSelected = { id ->
+                        homeViewModel.selectSpace(id)
+                        homeViewModel.loadProcedures(id)
+                    }
                 )
-            } else if (state.selectedSpaceId != null && !state.isLoading) {
-                EmptyFolderState()
+
+                if (state.error != null) {
+                    Text("Ocurrió un error al cargar los espacios. \n ${state.error}")
+                }
+
+                if (state.folders.isNotEmpty()) {
+                    FolderList(
+                        folders = state.folders,
+                        expandedFolderIds = state.expandedFolderIds,
+                        proceduresByFolder = state.proceduresByFolder,
+                        onToggleFolder = { folderId ->
+                            homeViewModel.toggleFolder(folderId)
+                        },
+                        onNavigateToProcedure = onNavigateToProcedure
+                    )
+                } else if (state.selectedSpaceId != null && !state.isLoading) {
+                    EmptyFolderState()
+                }
             }
+
+            LoadingIndicator(isLoading = state.isLoading)
         }
     }
 }
