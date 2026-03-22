@@ -10,6 +10,7 @@
 - Componente `LoadingIndicator` para indicar el estado de carga
 - Implementación de `LoadingIndicator` en `HomeScreen` para mostrar el estado de carga
 - Implementación de `LoadingIndicator` en `ProcedureScreen` para mostrar el estado de carga
+- Implementación de `LoadingIndicator` en `SettingScreen` para mostrar el estado de carga
 
 ---
 
