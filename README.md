@@ -1,63 +1,94 @@
-# FlowGuide
+# FlowGuide — Android App
 
-> Aplicación móvil de productividad y organización personal en desarrollo.
+Proyecto personal en desarrollo activo. Android nativo con enfoque en
+arquitectura limpia, código mantenible y buenas prácticas desde el inicio.
 
-## Sobre el proyecto
-
-FlowGuide es una aplicación Android diseñada para ayudar a los usuarios a gestionar su flujo de trabajo diario, tareas y objetivos personales. El proyecto se encuentra actualmente en fase de desarrollo activo.
-
-**Estado actual:** v0.1.0 - Autenticación implementada
-
-## Stack Tecnológico
-
-| Categoría | Tecnología |
-|-----------|------------|
-| **Lenguaje** | Kotlin 2.3.10 |
-| **UI** | Jetpack Compose + Material 3 |
-| **Arquitectura** | MVVM + Clean Architecture |
-| **Inyección de dependencias** | Hilt (Dagger) |
-| **Navegación** | Navigation Compose con rutas type-safe |
-| **Backend** | Supabase (Auth, Postgrest, Realtime) |
-| **Networking** | Ktor + OkHttp |
-| **Animaciones** | Lottie |
-| **Serialización** | Kotlinx Serialization |
+---
 
 ## Arquitectura
 
-El proyecto sigue los principios de **Clean Architecture** con una estructura modular por features:
+Clean Architecture con separación estricta en tres capas por feature:
 
 ```
-app/src/main/java/com/jeremiascortes/flowguide/
-├── features/
-│   └── [feature]/
-│       ├── data/           # Implementaciones de repositorios, DTOs
-│       ├── di/             # Módulos Hilt
-│       ├── domain/         # Modelos, interfaces, casos de uso
-│       └── presentation/   # ViewModels, Screens
-└── navigation/             # Configuración de navegación
+features/
+└── [feature]/
+├── data/        # DTOs, implementaciones de repositorio, fuentes de datos
+├── domain/      # Modelos, interfaces, casos de uso
+└── presentation/# ViewModels, Screens, componentes UI
 ```
 
-### Características implementadas
+Cada feature es autónoma. Las capas se comunican hacia adentro:
+`presentation → domain ← data`. El dominio no sabe nada de Supabase,
+Hilt ni Compose.
 
-- Sistema de autenticación completo (email/password + Google OAuth)
-- Gestión de sesión con verificación automática
-- Navegación type-safe con animaciones fluidas
-- Deep links para OAuth
+---
+
+## Stack
+
+| Capa | Tecnología |
+|------|------------|
+| UI | Jetpack Compose + Material 3 |
+| Arquitectura | MVVM + Clean Architecture |
+| DI | Hilt (Dagger) |
+| Navegación | Navigation Compose — rutas type-safe con `@Serializable` |
+| Backend | Supabase (Auth, Postgrest, Realtime) |
+| Networking | Ktor + OkHttp |
+| Animaciones | Lottie |
+| Lenguaje | Kotlin 2.x |
+
+---
+
+## Decisiones técnicas destacadas
+
+**Navegación type-safe**
+Rutas definidas como `sealed class` con `@Serializable`. Sin strings
+mágicos, sin crashes en tiempo de ejecución por argumentos mal tipados.
+
+**Eventos de navegación con `Channel`**
+Los ViewModels emiten eventos de navegación a través de `Channel<T>` en
+lugar de `StateFlow`. Evita condiciones de carrera donde la UI procesa
+un evento de navegación que ya no debería estar activo.
+
+**`withProcedure {}` helper**
+Función privada en `ProcedureViewModel` que encapsula el null-check del
+estado actual antes de ejecutar cualquier operación. Reduce código
+duplicado y hace explícita la precondición.
+
+**Estado de UI como data class**
+Cada feature tiene su propio `XState` que agrupa todo el estado de la
+pantalla. Un único `StateFlow<XState>` en lugar de múltiples flows
+independientes.
+
+**`rememberUpdatedState` para callbacks**
+Usado en componentes con `AndroidView` para evitar que callbacks
+capturados en closures queden desactualizados entre recomposiciones.
+
+---
+
+## Estructura de features implementadas
+
+- **Auth** — login/registro con email·contraseña + Google OAuth, gestión
+  de sesión con deep links (`flowguide://login`)
+- **Home** — navegación jerárquica Spaces → Folders → Procedures con
+  expansión animada y carga lazy por nivel
+- **Procedure** — visualización de pasos con `TreeCheckbox` (soporte para
+  subnodos), marcado de completado con persistencia en Supabase
+- **Settings** — logout con navegación limpia del back stack
+
+---
+
+## Changelog
+
+El proyecto mantiene un [CHANGELOG.md](CHANGELOG.md) con historial de cambios y versiones.
+
+---
 
 ## Autor
 
 **Jeremías Cortés**
-- GitHub: [@jeremiascortes](https://github.com/jeremiascortes)
-- Email: jeremiasacortes@gmail.com
-
-## Licencia
-
-Este proyecto está protegido bajo una licencia personalizada de **Código Visible con Derechos Reservados (CVDR)**.
-
-El código es públicamente visible con propósitos de portfolio, aprendizaje y revisión técnica. **No está permitido** usar, copiar o distribuir este código para crear productos derivados o comerciales.
-
-Ver [LICENSE.md](LICENSE.md) para más detalles.
+[linkedin.com/in/jeremias-cortes](https://linkedin.com/in/jeremias-cortes) ·
+[jeremiasacortes@gmail.com](mailto:jeremiasacortes@gmail.com)
 
 ---
 
-*Desarrollado como parte de mi portfolio profesional.*
+*Código visible con derechos reservados. Ver [LICENSE.md](LICENSE.md).*
