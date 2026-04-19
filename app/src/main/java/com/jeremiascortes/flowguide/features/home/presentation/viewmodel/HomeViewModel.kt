@@ -17,7 +17,7 @@ package com.jeremiascortes.flowguide.features.home.presentation.viewmodel
  * Cada nivel carga sus datos cuando se selecciona el padre.
  *
  * STATE MANAGEMENT:
- * - HomeState: Data class que agrupa todo el estado de la pantalla
+ * - HomeState: Data class que agrupa el estado completo de la pantalla
  * - _state: MutableStateFlow interno (solo el ViewModel puede modificar)
  * - state: StateFlow público expuesto a la UI (read-only)
  * ============================================================================
@@ -31,7 +31,6 @@ import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllFoldersBy
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdFolderUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdSpaceUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllSpacesUseCase
-import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllStepsByIdProcedureUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -48,7 +47,6 @@ class HomeViewModel @Inject constructor(
     private val getAllFoldersByIdSpaceUseCase: GetAllFoldersByIdSpaceUseCase,
     private val getAllProceduresByIdSpaceUseCase: GetAllProceduresByIdSpaceUseCase,
     private val getAllProceduresByIdFolderUseCase: GetAllProceduresByIdFolderUseCase,
-    private val getAllStepsByIdProcedureUseCase: GetAllStepsByIdProcedureUseCase,
 ) : ViewModel() {
 
     // Backing property: MutableStateFlow privado (solo el ViewModel puede escribir)
@@ -68,13 +66,19 @@ class HomeViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
 
             when (val result = getAllSpacesUseCase()) {
-                is HomeResult.Loading -> {}
+                // El loading ya se maneja al inicio de la función, aquí no se requiere acción adicional
+                is HomeResult.Loading -> Unit
 
                 is HomeResult.Success -> {
                     _state.value = _state.value.copy(
                         isLoading = false,
                         spaces = result.data
                     )
+
+                    // Seleccionamos automáticamente el primer espacio disponible
+                    result.data.firstOrNull()?.let { firstSpace ->
+                        selectSpace(firstSpace.idSpace)
+                    }
                 }
 
                 is HomeResult.Error -> {
@@ -92,7 +96,8 @@ class HomeViewModel @Inject constructor(
             _state.value = _state.value.copy(isLoading = true)
 
             when (val result = getAllProceduresByIdSpaceUseCase(idSpace)) {
-                is HomeResult.Loading -> {}
+                // El loading ya se maneja al inicio, no se requiere acción adicional
+                is HomeResult.Loading -> Unit
 
                 is HomeResult.Success -> {
                     _state.value = _state.value.copy(
@@ -116,7 +121,7 @@ class HomeViewModel @Inject constructor(
         // Se obtiene la lista actual de carpetas expandidas
         val currentExpanded = _state.value.expandedFolderIds
 
-        // La carpeta que se está expandiendo o contrae ya estaba abierta?
+        // ¿La carpeta que se está expandiendo o contrae ya estaba abierta?
         val isCurrentlyExpanded = folderId in currentExpanded
 
 
@@ -134,14 +139,15 @@ class HomeViewModel @Inject constructor(
         if (!isCurrentlyExpanded) {
             viewModelScope.launch {
                 when (val result = getAllProceduresByIdFolderUseCase(folderId)) {
-                    is HomeResult.Loading -> {}
+                    // El loading no aplica en esta operación asíncrona
+                    is HomeResult.Loading -> Unit
                     is HomeResult.Success -> {
                         _state.value = _state.value.copy(
                             proceduresByFolder = _state.value.proceduresByFolder + (folderId to result.data)
                         )
                     }
 
-                    is HomeResult.Error -> {}
+                    is HomeResult.Error -> Unit
                 }
             }
         }
@@ -166,9 +172,8 @@ class HomeViewModel @Inject constructor(
 
             // Cargar carpetas del espacio seleccionado
             when (val result = getAllFoldersByIdSpaceUseCase(spaceId)) {
-                is HomeResult.Loading -> {
-                    _state.value = _state.value.copy(isLoading = true)
-                }
+                // El loading ya se activó al inicio de selectSpace()
+                is HomeResult.Loading -> Unit
 
                 is HomeResult.Success -> {
                     _state.value = _state.value.copy(
@@ -195,12 +200,5 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch {
             logoutUseCase()
         }
-    }
-
-    /**
-     * Limpia el mensaje de error.
-     */
-    fun clearError() {
-        _state.value = _state.value.copy(error = null)
     }
 }
