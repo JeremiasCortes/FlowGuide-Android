@@ -32,4 +32,11 @@ class MainActivity : ComponentActivity() {
             }
         }
     }
+
+    // Necesario para que el callback de OAuth funcione cuando la app ya estaba abierta.
+    // Sin esto, el deep link de Google solo se procesaría si la app se abre desde cero.
+    override fun onNewIntent(intent: android.content.Intent) {
+        super.onNewIntent(intent)
+        supabaseClientWrapper.supabaseClient.handleDeeplinks(intent)
+    }
 }

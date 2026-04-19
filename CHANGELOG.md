@@ -12,6 +12,9 @@
 - Implementación de `LoadingIndicator` en `ProcedureScreen` para mostrar el estado de carga
 - Implementación de `LoadingIndicator` en `SettingScreen` para mostrar el estado de carga
 
+### Fixed
+- Corrección de condiciones de carrera en login/logout
+
 ---
 
 ## [22-03-2026] - v0.4.0

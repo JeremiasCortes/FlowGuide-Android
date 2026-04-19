@@ -64,6 +64,9 @@ import com.jeremiascortes.flowguide.presentation.components.BottomBarItem
 fun AppNavHost() {
     val navController = rememberNavController()
 
+    // AuthViewModel compartido: scoped a la Activity para que todas
+    // las pantallas de auth compartan la misma instancia y estado
+    val authViewModel: AuthViewModel = hiltViewModel()
 
     val bottomBarItems = remember {
         listOf(
@@ -117,7 +120,7 @@ fun AppNavHost() {
         // ==================== AUTH FLOW ====================
 
         composable<AppRoute.Auth.Splash> {
-            val authViewModel: AuthViewModel = hiltViewModel()
+            // Observamos el estado del ViewModel compartido
             val authState by authViewModel.authState.collectAsState()
 
             SplashScreen(
@@ -139,9 +142,9 @@ fun AppNavHost() {
         }
 
         composable<AppRoute.Auth.Login> {
-            val viewModel: AuthViewModel = hiltViewModel()
+            // Usamos la misma instancia del ViewModel compartido
             LoginScreen(
-                viewModel = viewModel,
+                viewModel = authViewModel,
                 onNavigateToRegister = {
                     navController.navigate(AppRoute.Auth.Register)
                 },
@@ -155,9 +158,9 @@ fun AppNavHost() {
         }
 
         composable<AppRoute.Auth.Register> {
-            val viewModel: AuthViewModel = hiltViewModel()
+            // Usamos la misma instancia del ViewModel compartido
             RegisterScreen(
-                viewModel = viewModel,
+                viewModel = authViewModel,
                 onNavigateToLogin = {
                     navController.navigate(AppRoute.Auth.Login)
                 },
@@ -194,7 +197,6 @@ fun AppNavHost() {
 
         composable<AppRoute.Settings.General> {
             val settingsViewModel: SettingsViewModel = hiltViewModel()
-            val authViewModel: AuthViewModel = hiltViewModel()
 
             SettingScreen(
                 settingsViewModel = settingsViewModel,

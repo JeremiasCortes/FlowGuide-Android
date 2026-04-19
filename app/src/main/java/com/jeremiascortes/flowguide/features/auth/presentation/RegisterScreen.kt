@@ -52,7 +52,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import com.jeremiascortes.flowguide.features.auth.domain.model.AuthResult
-import com.jeremiascortes.flowguide.features.auth.domain.model.AuthState
 
 @Composable
 fun RegisterScreen(
@@ -60,9 +59,8 @@ fun RegisterScreen(
     onNavigateToHome: () -> Unit,
     onNavigateToLogin: () -> Unit
 ) {
-    // Observamos el estado de autenticación y el resultado de operaciones
+    // Observamos el resultado de operaciones del ViewModel
     val authResult by viewModel.authResult.collectAsState()
-    val authState by viewModel.authState.collectAsState()
 
     // Estados locales para los campos del formulario
     var name by remember { mutableStateOf("") }
@@ -71,10 +69,13 @@ fun RegisterScreen(
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
 
-    // Efecto: Si el usuario se autentica, navegar a Home
-    LaunchedEffect(authState) {
-        if (authState is AuthState.Authenticated) {
-            onNavigateToHome()
+    // Efecto: Observar eventos de navegación del ViewModel (mismo patrón que LoginScreen)
+    LaunchedEffect(Unit) {
+        viewModel.navigationEvent.collect { event ->
+            when (event) {
+                is NavigationEvent.ToHome -> onNavigateToHome()
+                is NavigationEvent.ToLogin -> onNavigateToLogin()
+            }
         }
     }
 

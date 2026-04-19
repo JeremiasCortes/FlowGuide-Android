@@ -76,29 +76,45 @@ class AuthViewModel @Inject constructor(
 
     init {
         // Al crear el ViewModel, verificar si ya hay sesión activa
-        checkAuthStatus()
-    }
-
-    /**
-     * Verifica el estado actual de la sesión.
-     * Se llama al iniciar y después de operaciones de autenticación.
-     */
-    private fun checkAuthStatus() {
         viewModelScope.launch {
-            _authState.value = getCurrentSessionUseCase()
+            checkAuthStatus()
         }
     }
 
     /**
+     * Verifica el estado actual de la sesión y lo retorna.
+     *
+     * IMPORTANTE: Es suspend (no lanza coroutine nueva) para que el llamador
+     * pueda verificar el resultado ANTES de tomar decisiones (como navegar).
+     *
+     * El antiguo checkAuthStatus() usaba viewModelScope.launch, lo que creaba
+     * una race condition: la navegación ocurría antes de verificar la sesión.
+     */
+    private suspend fun checkAuthStatus(): AuthState {
+        val state = getCurrentSessionUseCase()
+        _authState.value = state
+        return state
+    }
+
+    /**
      * Inicia sesión con email y contraseña.
+     *
+     * PATRÓN CORRECTO: Después de un AuthResult.Success, verificamos que la
+     * sesión realmente exista antes de navegar. Esto evita llegar a Home
+     * sin estar autenticado (race condition del antiguo checkAuthStatus).
      */
     fun login(email: String, password: String) {
         viewModelScope.launch {
             _authResult.value = AuthResult.Loading
             _authResult.value = loginUseCase(email, password)
             if (_authResult.value is AuthResult.Success) {
-                checkAuthStatus()
-                _navigationEvent.send(NavigationEvent.ToHome)
+                // Verificar sesión ANTES de navegar (no fire-and-forget)
+                val state = checkAuthStatus()
+                if (state is AuthState.Authenticated) {
+                    _navigationEvent.send(NavigationEvent.ToHome)
+                } else {
+                    _authResult.value = AuthResult.Error("No se pudo verificar la sesión")
+                }
             }
         }
     }
@@ -112,8 +128,12 @@ class AuthViewModel @Inject constructor(
             _authResult.value = AuthResult.Loading
             _authResult.value = signInWithGoogleUseCase()
             if (_authResult.value is AuthResult.Success) {
-                checkAuthStatus()
-                _navigationEvent.send(NavigationEvent.ToHome)
+                // TODO(human): Verificar la sesión antes de navegar a Home.
+                // Usa checkAuthStatus() (ahora retorna AuthState) para confirmar
+                // que el usuario realmente está autenticado. Solo envía
+                // NavigationEvent.ToHome si el estado es Authenticated.
+                // Si no está autenticado, muestra un error con _authResult.
+                // Mira el método login() arriba como referencia del patrón.
             }
         }
     }
@@ -132,6 +152,7 @@ class AuthViewModel @Inject constructor(
             _authResult.value = AuthResult.Loading
             _authResult.value = registerUseCase(name, email, birthday, password, confirmPassword)
             if (_authResult.value is AuthResult.Success) {
+                // Actualiza el estado de autenticación (no necesita navegar aquí)
                 checkAuthStatus()
             }
         }
@@ -143,6 +164,7 @@ class AuthViewModel @Inject constructor(
     fun logout() {
         viewModelScope.launch {
             logoutUseCase()
+            // Actualiza el estado (siempre navega a login después)
             checkAuthStatus()
             _navigationEvent.send(NavigationEvent.ToLogin)
         }
