@@ -152,8 +152,7 @@ class AuthViewModel @Inject constructor(
             _authResult.value = AuthResult.Loading
             _authResult.value = registerUseCase(name, email, birthday, password, confirmPassword)
             if (_authResult.value is AuthResult.Success) {
-                // Actualiza el estado de autenticación (no necesita navegar aquí)
-                checkAuthStatus()
+                _navigationEvent.send(NavigationEvent.ToHome)
             }
         }
     }
