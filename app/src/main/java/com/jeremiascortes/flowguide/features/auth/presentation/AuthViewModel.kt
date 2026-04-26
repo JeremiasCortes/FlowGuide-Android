@@ -131,6 +131,8 @@ class AuthViewModel @Inject constructor(
         password: String,
         confirmPassword: String
     ) {
+        // TODO: Validar campos, manejar errores, etc.
+
         viewModelScope.launch {
             _authResult.value = AuthResult.Loading
             _authResult.value = registerUseCase(name, email, birthday, password, confirmPassword)
