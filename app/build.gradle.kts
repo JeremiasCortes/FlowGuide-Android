@@ -89,4 +89,14 @@ dependencies {
 
     // Iconos
     implementation(libs.androidx.compose.material.icons.extended)
+
+    /**
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     * TESTS
+     * - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+     */
+    testImplementation(libs.mockk)
+    testImplementation(libs.turbine)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit.jupiter)
 }
