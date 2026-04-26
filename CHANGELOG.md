@@ -12,10 +12,10 @@
 - Implementación de `LoadingIndicator` en `ProcedureScreen` para mostrar el estado de carga
 - Implementación de `LoadingIndicator` en `SettingScreen` para mostrar el estado de carga
 - Selección automática del primer espacio disponible al iniciar la aplicación
-- Tests unitarios para `LoginUseCase`
+- Tests unitarios para `AuthViewModel`
 
 ### Removed
-- Errores de SonaarQube
+- Errores de SonarQube
 
 ### Fixed
 - Corrección de condiciones de carrera en login/logout
