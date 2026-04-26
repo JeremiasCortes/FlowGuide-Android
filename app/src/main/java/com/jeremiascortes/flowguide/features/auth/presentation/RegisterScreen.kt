@@ -193,6 +193,7 @@ fun RegisterScreen(
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        // TODO: No mostrar errores en brutos, se tiene que mostrar con diálogos
         // Mostrar errores si los hay
         if (authResult is AuthResult.Error) {
             Text(
