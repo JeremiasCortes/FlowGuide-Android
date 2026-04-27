@@ -9,32 +9,6 @@ import kotlinx.coroutines.test.setMain
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 
-/**
- * ============================================================================
- * REGLA JUnit: MainDispatcherRule
- * ============================================================================
- *
- * Reemplaza Dispatchers.Main con un TestDispatcher durante los tests.
- *
- * PROBLEMA QUE RESUELVE:
- * viewModelScope.launch usa Dispatchers.Main internamente.
- * En un test unitario (JVM) NO existe Dispatchers.Main → explota.
- * Esta regla lo reemplaza con un dispatcher de test que ejecuta
- * las corrutinas de forma síncrona e instantánea.
- *
- * CÓMO FUNCIONA:
- * - @get:Rule → JUnit ejecuta starting() ANTES de cada @Test
- * - @get:Rule → JUnit ejecuta finished() DESPUÉS de cada @Test
- * - Así Dispatchers.Main está "mockeado" solo durante el test
- *
- * USO:
- * @get:Rule
- * val mainDispatcherRule = MainDispatcherRule()
- *
- * NOTA: Esta clase es estándar en Android. La usaremos en TODOS
- * los tests de ViewModel del proyecto.
- * ============================================================================
- */
 @OptIn(ExperimentalCoroutinesApi::class)
 class MainDispatcherRule(
     private val testDispatcher: TestDispatcher = UnconfinedTestDispatcher()
