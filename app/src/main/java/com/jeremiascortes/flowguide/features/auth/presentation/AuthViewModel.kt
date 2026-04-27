@@ -93,6 +93,9 @@ class AuthViewModel @Inject constructor(
     private suspend fun checkAuthStatus(): AuthState {
         val state = getCurrentSessionUseCase()
         _authState.value = state
+        if (state is AuthState.Authenticated) {
+            _navigationEvent.send(NavigationEvent.ToHome)
+        }
         return state
     }
 
@@ -118,6 +121,9 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authResult.value = AuthResult.Loading
             _authResult.value = signInWithGoogleUseCase()
+            if (_authResult.value is AuthResult.Success) {
+                _navigationEvent.send(NavigationEvent.ToHome)
+            }
         }
     }
 
