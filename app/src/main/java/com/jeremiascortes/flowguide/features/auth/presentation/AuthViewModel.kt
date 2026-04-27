@@ -63,7 +63,7 @@ class AuthViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Estado de autenticación: Loading, Authenticated, NotAuthenticated
-    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
+    private val _authState = MutableStateFlow<AuthState>(AuthState.NotAuthenticated)
     val authState: StateFlow<AuthState> = _authState.asStateFlow()
 
     // Resultado de la última operación: Success, Error, Loading
