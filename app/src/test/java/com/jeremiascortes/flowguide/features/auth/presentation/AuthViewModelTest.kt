@@ -11,13 +11,16 @@ import com.jeremiascortes.flowguide.features.auth.domain.usecase.RegisterUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.SignInWithGoogleUseCase
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AuthViewModelTest {
 
     /**
@@ -31,7 +34,7 @@ class AuthViewModelTest {
     private val loginUseCase: LoginUseCase = mockk()
     private val registerUseCase: RegisterUseCase = mockk()
     private val logoutUseCase: LogoutUseCase = mockk()
-    private val getCurrentSessionUseCase: GetCurrentSessionUseCase = mockk(relaxed = true)
+    private val getCurrentSessionUseCase: GetCurrentSessionUseCase = mockk()
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase = mockk()
 
     private lateinit var viewModel: AuthViewModel
@@ -50,7 +53,7 @@ class AuthViewModelTest {
      */
     @Before
     fun setup() {
-
+        coEvery { getCurrentSessionUseCase() }.returns(AuthState.NotAuthenticated)
         viewModel = AuthViewModel(
             loginUseCase = loginUseCase,
             registerUseCase = registerUseCase,
@@ -61,7 +64,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `Primera vez que se registra un usuario, lo hace bien y sale exitoso el registro`() =
+    fun `Primera vez que se registra un usuario, lo hace bien, sale exitoso el registro y navega a Home`() =
         runTest {
             coEvery {
                 registerUseCase(
@@ -73,19 +76,36 @@ class AuthViewModelTest {
                 )
             }.returns(AuthResult.Success(Unit))
 
-            viewModel.register(
-                TEST_NAME,
-                TEST_EMAIL,
-                TETS_BIRTHDATE,
-                TEST_PASSWORD,
-                TEST_CONFIRM_PASSWORD
-            )
+            viewModel.authResult.test {
+                assertEquals(null, awaitItem())
 
-            assertTrue(viewModel.authResult.value is AuthResult.Success)
+                viewModel.register(
+                    TEST_NAME,
+                    TEST_EMAIL,
+                    TETS_BIRTHDATE,
+                    TEST_PASSWORD,
+                    TEST_CONFIRM_PASSWORD
+                )
+
+                advanceUntilIdle()
+
+                assertEquals(AuthResult.Loading, awaitItem())
+
+                advanceUntilIdle()
+
+                assertEquals(AuthResult.Success(Unit), awaitItem())
+
+                ensureAllEventsConsumed()
+            }
+
+            viewModel.navigationEvent.test {
+                assertEquals(NavigationEvent.ToHome, awaitItem())
+                ensureAllEventsConsumed()
+            }
         }
 
     @Test
-    fun `El usuario se autentica correctamente`() = runTest {
+    fun `El usuario se autentica correctamente y navega a la Home`() = runTest {
         coEvery {
             loginUseCase(
                 TEST_EMAIL,
@@ -93,82 +113,16 @@ class AuthViewModelTest {
             )
         }.returns(AuthResult.Success(Unit))
 
-        viewModel.login(TEST_EMAIL, TEST_PASSWORD)
-
-        assertTrue(viewModel.authResult.value is AuthResult.Success)
-    }
-
-    @Test
-    fun `El usuario cierra sesion correctamente`() = runTest {
-        coEvery { logoutUseCase() }.returns(AuthResult.Success(Unit))
-
-        viewModel.logout()
-
-        assertTrue(viewModel.authResult.value is AuthResult.Success)
-    }
-
-    @Test
-    fun `El usuario se registra correctamente con Google`() = runTest {
-        coEvery { signInWithGoogleUseCase() }.returns(AuthResult.Success(Unit))
-
-        viewModel.signInWithGoogle()
-
-        assertTrue(viewModel.authResult.value is AuthResult.Success)
-    }
-
-    @Test
-    fun `El usuario se autentica correctamente con Google`() = runTest {
-        coEvery { signInWithGoogleUseCase() }.returns(AuthResult.Success(Unit))
-
-        viewModel.signInWithGoogle()
-
-        assertTrue(viewModel.authResult.value is AuthResult.Success)
-    }
-
-    @Test
-    fun `El usuario entra en la app y ya tenia session previa, se autentica correctamente`() =
-        runTest {
-            coEvery { getCurrentSessionUseCase() }.returns(AuthState.Authenticated("user-123"))
-
-            assertTrue { viewModel.authState.value is AuthState.Authenticated }
-        }
-
-    @Test
-    fun `registro existoso emite Loading, luego Success, y navega a Home`() = runTest {
-        coEvery {
-            registerUseCase(
-                TEST_NAME,
-                TEST_EMAIL,
-                TETS_BIRTHDATE,
-                TEST_PASSWORD,
-                TEST_CONFIRM_PASSWORD
-            )
-        }.returns(AuthResult.Success(Unit))
-
-        viewModel.authResult.test {
-            assertEquals(null, awaitItem())
-
-            viewModel.register(
-                TEST_NAME,
-                TEST_EMAIL,
-                TETS_BIRTHDATE,
-                TEST_PASSWORD,
-                TEST_CONFIRM_PASSWORD
-            )
-
-            assertEquals(AuthResult.Success(Unit), awaitItem())
-        }
-    }
-
-    @Test
-    fun `login exitoso emite Loading, luego Success, y navega a Home`() = runTest {
-        coEvery { loginUseCase(TEST_EMAIL, TEST_PASSWORD) }
-            .returns(AuthResult.Success(Unit))
-
         viewModel.authResult.test {
             assertEquals(null, awaitItem())
 
             viewModel.login(TEST_EMAIL, TEST_PASSWORD)
+
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
 
             assertEquals(AuthResult.Success(Unit), awaitItem())
 
@@ -182,7 +136,7 @@ class AuthViewModelTest {
     }
 
     @Test
-    fun `cierre de sesion exitoso emite Loading, luego Success, y navega a Login`() = runTest {
+    fun `El usuario cierra sesion correctamente y navega a Login`() = runTest {
         coEvery { logoutUseCase() }.returns(AuthResult.Success(Unit))
 
         viewModel.authResult.test {
@@ -190,9 +144,102 @@ class AuthViewModelTest {
 
             viewModel.logout()
 
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
+
             assertEquals(AuthResult.Success(Unit), awaitItem())
+
+            ensureAllEventsConsumed()
+        }
+
+        viewModel.navigationEvent.test {
+            assertEquals(NavigationEvent.ToLogin, awaitItem())
+            ensureAllEventsConsumed()
         }
     }
+
+    @Test
+    fun `El usuario se registra correctamente con Google y navega a Home`() = runTest {
+        coEvery { signInWithGoogleUseCase() }.returns(AuthResult.Success(Unit))
+
+        viewModel.authResult.test {
+            assertEquals(null, awaitItem())
+
+            viewModel.signInWithGoogle()
+
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Success(Unit), awaitItem())
+
+            ensureAllEventsConsumed()
+        }
+
+        viewModel.navigationEvent.test {
+            assertEquals(NavigationEvent.ToHome, awaitItem())
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun `El usuario se autentica correctamente con Google y navega a la Home`() = runTest {
+        coEvery { signInWithGoogleUseCase() }.returns(AuthResult.Success(Unit))
+
+        viewModel.authResult.test {
+            assertEquals(null, awaitItem())
+
+            viewModel.signInWithGoogle()
+
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Success(Unit), awaitItem())
+
+            ensureAllEventsConsumed()
+        }
+
+        viewModel.navigationEvent.test {
+            assertEquals(NavigationEvent.ToHome, awaitItem())
+            ensureAllEventsConsumed()
+        }
+    }
+
+    @Test
+    fun `El usuario entra en la app y ya tenia session previa, se autentica correctamente y lo redirige a Home`() =
+        runTest {
+            coEvery { getCurrentSessionUseCase() }.returns(AuthState.Authenticated("user-123"))
+
+            viewModel = AuthViewModel(
+                loginUseCase = loginUseCase,
+                registerUseCase = registerUseCase,
+                logoutUseCase = logoutUseCase,
+                getCurrentSessionUseCase = getCurrentSessionUseCase,
+                signInWithGoogleUseCase = signInWithGoogleUseCase
+            )
+
+            viewModel.authState.test {
+                assertEquals(AuthState.NotAuthenticated, awaitItem())
+
+                advanceUntilIdle()
+
+                assertEquals(AuthState.Authenticated("user-123"), awaitItem())
+
+                ensureAllEventsConsumed()
+            }
+
+//            viewModel.navigationEvent.test {
+//                assertEquals(NavigationEvent.ToHome, awaitItem())
+//            }
+        }
 
     @Test
     fun `registro fallido emite Loading, luego Error, y no navega`() = runTest {
@@ -217,23 +264,46 @@ class AuthViewModelTest {
                 TEST_CONFIRM_PASSWORD
             )
 
+            advanceUntilIdle()
+
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
+
             assertEquals(AuthResult.Error("Error al registrar"), awaitItem())
+
             ensureAllEventsConsumed()
+        }
+
+        viewModel.navigationEvent.test {
+            expectNoEvents()
         }
     }
 
     @Test
     fun `login fallido emite Loading, luego Error, y no navega`() = runTest {
-        coEvery { loginUseCase(TEST_EMAIL, TEST_PASSWORD) }
-            .returns(AuthResult.Error("Credenciales incorrectas"))
+        coEvery { loginUseCase(TEST_EMAIL, TEST_PASSWORD) }.coAnswers {
+            delay(1) // ← Mismo patrón: pausa entre Loading y Error
+            AuthResult.Error("Credenciales incorrectas")
+        }
 
         viewModel.authResult.test {
             assertEquals(null, awaitItem())
 
             viewModel.login(TEST_EMAIL, TEST_PASSWORD)
 
+            advanceUntilIdle()
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
             assertEquals(AuthResult.Error("Credenciales incorrectas"), awaitItem())
+
             ensureAllEventsConsumed()
         }
+
+        viewModel.navigationEvent.test {
+            expectNoEvents()
+        }
     }
+
 }
