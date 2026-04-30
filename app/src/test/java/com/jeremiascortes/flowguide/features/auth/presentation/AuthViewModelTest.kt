@@ -236,9 +236,9 @@ class AuthViewModelTest {
                 ensureAllEventsConsumed()
             }
 
-//            viewModel.navigationEvent.test {
-//                assertEquals(NavigationEvent.ToHome, awaitItem())
-//            }
+            viewModel.navigationEvent.test {
+                assertEquals(NavigationEvent.ToHome, awaitItem())
+            }
         }
 
     @Test
@@ -306,4 +306,55 @@ class AuthViewModelTest {
         }
     }
 
+    @Test
+    fun `Login con google fallido, emite Loading, luego Error, y no navega`() = runTest {
+        coEvery { signInWithGoogleUseCase() }.coAnswers {
+            delay(1)
+            AuthResult.Error("Hubo un error")
+        }
+
+        viewModel.authResult.test {
+            assertEquals(null, awaitItem())
+
+            viewModel.signInWithGoogle()
+
+            advanceUntilIdle()
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
+            assertEquals(AuthResult.Error("Hubo un error"), awaitItem())
+
+            ensureAllEventsConsumed()
+        }
+
+        viewModel.navigationEvent.test {
+            expectNoEvents()
+        }
+    }
+
+    @Test
+    fun `logout fallido, emite Loading, luego Error, y no navega`() = runTest {
+        coEvery { logoutUseCase() }.coAnswers {
+            delay(1)
+            AuthResult.Error("Hubo un error")
+        }
+
+        viewModel.authResult.test {
+            assertEquals(null, awaitItem())
+
+            viewModel.logout()
+
+            advanceUntilIdle()
+            assertEquals(AuthResult.Loading, awaitItem())
+
+            advanceUntilIdle()
+            assertEquals(AuthResult.Error("Hubo un error"), awaitItem())
+
+            ensureAllEventsConsumed()
+        }
+
+        viewModel.navigationEvent.test {
+            expectNoEvents()
+        }
+    }
 }
