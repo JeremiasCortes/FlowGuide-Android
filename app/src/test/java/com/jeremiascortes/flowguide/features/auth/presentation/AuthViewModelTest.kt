@@ -12,7 +12,6 @@ import com.jeremiascortes.flowguide.features.auth.domain.usecase.SignInWithGoogl
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -283,7 +282,6 @@ class AuthViewModelTest {
     @Test
     fun `login fallido emite Loading, luego Error, y no navega`() = runTest {
         coEvery { loginUseCase(TEST_EMAIL, TEST_PASSWORD) }.coAnswers {
-            delay(1) // ← Mismo patrón: pausa entre Loading y Error
             AuthResult.Error("Credenciales incorrectas")
         }
 
@@ -309,7 +307,6 @@ class AuthViewModelTest {
     @Test
     fun `Login con google fallido, emite Loading, luego Error, y no navega`() = runTest {
         coEvery { signInWithGoogleUseCase() }.coAnswers {
-            delay(1)
             AuthResult.Error("Hubo un error")
         }
 
@@ -335,7 +332,6 @@ class AuthViewModelTest {
     @Test
     fun `logout fallido, emite Loading, luego Error, y no navega`() = runTest {
         coEvery { logoutUseCase() }.coAnswers {
-            delay(1)
             AuthResult.Error("Hubo un error")
         }
 

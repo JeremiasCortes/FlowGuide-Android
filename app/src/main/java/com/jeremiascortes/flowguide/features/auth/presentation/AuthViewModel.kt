@@ -155,9 +155,10 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authResult.value = AuthResult.Loading
             _authResult.value = logoutUseCase()
-            // Actualiza el estado (siempre navega a login después)
             checkAuthStatus()
-            _navigationEvent.send(NavigationEvent.ToLogin)
+            if (_authResult.value is AuthResult.Success) {
+                _navigationEvent.send(NavigationEvent.ToLogin)
+            }
         }
     }
 }
