@@ -31,8 +31,11 @@ import com.jeremiascortes.flowguide.features.auth.domain.repository.AuthReposito
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
+import io.github.jan.supabase.auth.status.SessionStatus
 import jakarta.inject.Inject
 import jakarta.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import kotlinx.serialization.json.buildJsonObject
 import kotlinx.serialization.json.put
 
@@ -145,6 +148,35 @@ class AuthRepositoryImpl @Inject constructor(
             }
         } catch (e: Exception) {
             AuthState.NotAuthenticated
+        }
+    }
+
+    /**
+     * Observa los cambios de sesión de Supabase en tiempo real.
+     *
+     * CÓMO FUNCIONA:
+     * - Supabase expone sessionStatus como un StateFlow interno
+     * - Cada vez que la sesión cambia (login, logout, OAuth callback),
+     *   este Flow emite el nuevo estado
+     * - Lo convertimos a nuestro AuthState del dominio
+     *
+     * PARA QUÉ SIRVE:
+     * - Detectar cuando el OAuth de Google completa via deep link
+     * - El handleDeeplinks() de MainActivity actualiza la sesión internamente
+     * - Este observer nos avisa cuando eso ocurre
+     */
+    override fun observeSessionStatus(): Flow<AuthState> {
+        return supabaseClient.supabaseClient.auth.sessionStatus.map { status ->
+            when (status) {
+                is SessionStatus.Authenticated -> AuthState.Authenticated(
+                    status.session.user?.id ?: ""
+                )
+                is SessionStatus.NotAuthenticated -> AuthState.NotAuthenticated
+                // Initializing y RefreshFailure: la sesión aún no está lista,
+                // los tratamos como NoAuthenticated para simplificar
+                is SessionStatus.Initializing -> AuthState.NotAuthenticated
+                is SessionStatus.RefreshFailure -> AuthState.NotAuthenticated
+            }
         }
     }
 }

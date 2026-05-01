@@ -66,6 +66,7 @@ class ProcedureViewModel @Inject constructor(
                     error = exception.message
                 )
             }
+
         }
     }
 
@@ -122,7 +123,6 @@ class ProcedureViewModel @Inject constructor(
                 updatedSteps.forEach { step ->
                     toggleStepCompletionUseCase(step.id, false)
                 }
-
             }
         }
     }

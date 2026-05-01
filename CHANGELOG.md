@@ -12,7 +12,8 @@
 - Implementación de `LoadingIndicator` en `ProcedureScreen` para mostrar el estado de carga
 - Implementación de `LoadingIndicator` en `SettingScreen` para mostrar el estado de carga
 - Selección automática del primer espacio disponible al iniciar la aplicación
-- Tests unitarios para `AuthViewModel`
+- Tests unitarios `AuthViewModel`
+- Tests unitarios `SettingsViewModel`
 
 ### Removed
 - Errores de SonarQube

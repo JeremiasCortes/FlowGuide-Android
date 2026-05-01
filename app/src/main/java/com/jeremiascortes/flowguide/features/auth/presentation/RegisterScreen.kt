@@ -187,7 +187,7 @@ fun RegisterScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         // Enlace a login
-        TextButton(onClick = onNavigateToLogin) {
+        TextButton(onClick = {}) {
             Text("¿Ya tienes cuenta? Inicia Sesión")
         }
 

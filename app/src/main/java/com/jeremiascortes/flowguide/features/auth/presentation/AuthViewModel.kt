@@ -36,6 +36,7 @@ import com.jeremiascortes.flowguide.features.auth.domain.model.AuthState
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.GetCurrentSessionUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.LoginUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.LogoutUseCase
+import com.jeremiascortes.flowguide.features.auth.domain.usecase.ObserveSessionStatusUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.RegisterUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.SignInWithGoogleUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -59,7 +60,8 @@ class AuthViewModel @Inject constructor(
     private val registerUseCase: RegisterUseCase,
     private val logoutUseCase: LogoutUseCase,
     private val getCurrentSessionUseCase: GetCurrentSessionUseCase,
-    private val signInWithGoogleUseCase: SignInWithGoogleUseCase
+    private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
+    private val observeSessionStatusUseCase: ObserveSessionStatusUseCase
 ) : ViewModel() {
 
     // Estado de autenticación: Loading, Authenticated, NotAuthenticated
@@ -74,10 +76,27 @@ class AuthViewModel @Inject constructor(
     private val _navigationEvent = Channel<NavigationEvent>()
     val navigationEvent = _navigationEvent.receiveAsFlow()
 
+    // Flag para saber si hay un flujo de Google OAuth en curso
+    private var isGoogleAuthInProgress = false
+
     init {
         // Al crear el ViewModel, verificar si ya hay sesión activa
         viewModelScope.launch {
             checkAuthStatus()
+        }
+
+        // Observar cambios de sesión en tiempo real para detectar
+        // cuando el OAuth de Google completa via deep link
+        viewModelScope.launch {
+            observeSessionStatusUseCase().collect { state ->
+                // Solo actuamos si hay un Google OAuth en curso
+                if (state is AuthState.Authenticated && isGoogleAuthInProgress) {
+                    isGoogleAuthInProgress = false
+                    _authResult.value = AuthResult.Success(Unit)
+                    _authState.value = state
+                    _navigationEvent.send(NavigationEvent.ToHome)
+                }
+            }
         }
     }
 
@@ -116,13 +135,28 @@ class AuthViewModel @Inject constructor(
     /**
      * Autenticación con Google.
      * Funciona tanto para login como para registro (si no existe, lo crea).
+     *
+     * FLUJO ASÍNCRONO:
+     * 1. signInWith(Google) abre el navegador y retorna inmediatamente
+     * 2. El usuario se autentica en el navegador
+     * 3. El callback llega via deep link (flowguide://login)
+     * 4. handleDeeplinks() procesa el callback y actualiza la sesión
+     * 5. El observer de sesión detecta el cambio y navega a Home
+     *
+     * Por eso NO navegamos aquí: hay que esperar al observer.
      */
     fun signInWithGoogle() {
         viewModelScope.launch {
             _authResult.value = AuthResult.Loading
-            _authResult.value = signInWithGoogleUseCase()
-            if (_authResult.value is AuthResult.Success) {
-                _navigationEvent.send(NavigationEvent.ToHome)
+            val result = signInWithGoogleUseCase()
+            if (result is AuthResult.Error) {
+                // Si falla la iniciación del flujo OAuth, mostramos el error
+                _authResult.value = result
+            } else {
+                // Flujo OAuth iniciado correctamente.
+                // El navegador se abre y el usuario debe autenticarse.
+                // El observer de sesión detectará cuando complete y navegará.
+                isGoogleAuthInProgress = true
             }
         }
     }

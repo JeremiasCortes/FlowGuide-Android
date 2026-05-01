@@ -7,11 +7,14 @@ import com.jeremiascortes.flowguide.features.auth.domain.model.AuthState
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.GetCurrentSessionUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.LoginUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.LogoutUseCase
+import com.jeremiascortes.flowguide.features.auth.domain.usecase.ObserveSessionStatusUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.RegisterUseCase
 import com.jeremiascortes.flowguide.features.auth.domain.usecase.SignInWithGoogleUseCase
 import io.mockk.coEvery
+import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
@@ -35,6 +38,10 @@ class AuthViewModelTest {
     private val logoutUseCase: LogoutUseCase = mockk()
     private val getCurrentSessionUseCase: GetCurrentSessionUseCase = mockk()
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase = mockk()
+    private val observeSessionStatusUseCase: ObserveSessionStatusUseCase = mockk()
+
+    // Flow para simular cambios de sesión en los tests
+    private val sessionStatusFlow = MutableStateFlow<AuthState>(AuthState.NotAuthenticated)
 
     private lateinit var viewModel: AuthViewModel
 
@@ -53,12 +60,14 @@ class AuthViewModelTest {
     @Before
     fun setup() {
         coEvery { getCurrentSessionUseCase() }.returns(AuthState.NotAuthenticated)
+        every { observeSessionStatusUseCase() }.returns(sessionStatusFlow)
         viewModel = AuthViewModel(
             loginUseCase = loginUseCase,
             registerUseCase = registerUseCase,
             logoutUseCase = logoutUseCase,
             getCurrentSessionUseCase = getCurrentSessionUseCase,
-            signInWithGoogleUseCase = signInWithGoogleUseCase
+            signInWithGoogleUseCase = signInWithGoogleUseCase,
+            observeSessionStatusUseCase = observeSessionStatusUseCase
         )
     }
 
@@ -86,7 +95,7 @@ class AuthViewModelTest {
                     TEST_CONFIRM_PASSWORD
                 )
 
-                advanceUntilIdle()
+//                advanceUntilIdle()
 
                 assertEquals(AuthResult.Loading, awaitItem())
 
@@ -173,6 +182,8 @@ class AuthViewModelTest {
 
             assertEquals(AuthResult.Loading, awaitItem())
 
+            // Simular que el deep link callback llega y la sesión se establece
+            sessionStatusFlow.value = AuthState.Authenticated("user-google-123")
             advanceUntilIdle()
 
             assertEquals(AuthResult.Success(Unit), awaitItem())
@@ -199,6 +210,8 @@ class AuthViewModelTest {
 
             assertEquals(AuthResult.Loading, awaitItem())
 
+            // Simular que el deep link callback llega y la sesión se establece
+            sessionStatusFlow.value = AuthState.Authenticated("user-google-456")
             advanceUntilIdle()
 
             assertEquals(AuthResult.Success(Unit), awaitItem())
@@ -222,7 +235,8 @@ class AuthViewModelTest {
                 registerUseCase = registerUseCase,
                 logoutUseCase = logoutUseCase,
                 getCurrentSessionUseCase = getCurrentSessionUseCase,
-                signInWithGoogleUseCase = signInWithGoogleUseCase
+                signInWithGoogleUseCase = signInWithGoogleUseCase,
+                observeSessionStatusUseCase = observeSessionStatusUseCase
             )
 
             viewModel.authState.test {

@@ -27,6 +27,7 @@ package com.jeremiascortes.flowguide.features.auth.domain.repository
 
 import com.jeremiascortes.flowguide.features.auth.domain.model.AuthResult
 import com.jeremiascortes.flowguide.features.auth.domain.model.AuthState
+import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
 
@@ -68,4 +69,11 @@ interface AuthRepository {
      * Útil para saber si el usuario ya está logueado al iniciar la app.
      */
     suspend fun getCurrentSession(): AuthState
+
+    /**
+     * Observa los cambios de sesión en tiempo real.
+     * Emite AuthState cada vez que la sesión cambia (login, logout, OAuth callback).
+     * Especialmente útil para detectar cuando el OAuth de Google completa via deep link.
+     */
+    fun observeSessionStatus(): Flow<AuthState>
 }
