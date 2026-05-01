@@ -105,13 +105,13 @@ class ProcedureViewModel @Inject constructor(
         }
     }
 
-    fun resetAllStepsCompletion() {
+    fun resetAllStepsCompletion(newValue: Boolean = false) {
         viewModelScope.launch {
             withProcedure { currentProcedure ->
                 setLoading(true)
 
                 val updatedSteps = currentProcedure.steps.map { step ->
-                    step.copy(isCompleted = false)
+                    step.copy(isCompleted = newValue)
                 }
 
                 _state.value = _state.value.copy(
@@ -121,7 +121,7 @@ class ProcedureViewModel @Inject constructor(
                 setLoading(false)
 
                 updatedSteps.forEach { step ->
-                    toggleStepCompletionUseCase(step.id, false)
+                    toggleStepCompletionUseCase(step.id, newValue)
                 }
             }
         }

@@ -9,6 +9,7 @@ import com.jeremiascortes.flowguide.features.procedure.domain.model.Step
 import com.jeremiascortes.flowguide.features.procedure.domain.usecase.GetProcedureWithStepsUseCase
 import com.jeremiascortes.flowguide.features.procedure.domain.usecase.UpdateStepCompletion
 import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -125,5 +126,61 @@ class ProcedureViewModelTest {
 
             ensureAllEventsConsumed()
         }
+    }
+
+    @Test
+    fun `init carga el procedimiento automaticamente cuando procedureId esta en SavedStateHandle`() =
+        runTest {
+            val savedStateHandle = SavedStateHandle(mapOf("procedureId" to PROCEDURE_ID))
+
+            val viewModelWithId = ProcedureViewModel(
+                savedStateHandle = savedStateHandle,
+                getProcedureWithStepsUseCase = getProcedureWithStepsUseCase,
+                toggleStepCompletionUseCase = toggleStepCompletionUseCase
+            )
+
+            advanceUntilIdle()
+
+            assertEquals(procedure, viewModelWithId.state.value.procedure)
+            assertEquals(false, viewModelWithId.state.value.isLoading)
+        }
+
+    @Test
+    fun `toggleStepCompletion marca un paso como completado y llama al use case`() = runTest {
+        viewModel.loadProcedure(PROCEDURE_ID)
+        advanceUntilIdle()
+
+        // Verificamos estado inicial: paso 1 no completado
+        assertEquals(false, viewModel.state.value.procedure?.steps?.get(0)?.isCompleted)
+
+        // Acción: marcamos el paso 1 como completado
+        viewModel.toggleStepCompletion("1", true)
+        advanceUntilIdle()
+
+        // Verificación: el paso 1 ahora está completado y no hay loading residual
+        assertEquals(true, viewModel.state.value.procedure?.steps?.get(0)?.isCompleted)
+        assertEquals(false, viewModel.state.value.isLoading)
+
+        // Verificamos que el use case fue llamado con los parámetros correctos
+        coVerify { toggleStepCompletionUseCase("1", true) }
+    }
+
+    @Test
+    fun `resetAllStepsCompletion pone todos los pasos a no completados y llama al use case por cada paso`() = runTest {
+        viewModel.loadProcedure(PROCEDURE_ID)
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.state.value.procedure?.steps?.get(0)?.isCompleted)
+        assertEquals(true, viewModel.state.value.procedure?.steps?.get(1)?.isCompleted)
+        assertEquals(false, viewModel.state.value.procedure?.steps?.get(2)?.isCompleted)
+
+        viewModel.resetAllStepsCompletion(false)
+        advanceUntilIdle()
+
+        assertEquals(false, viewModel.state.value.procedure?.steps?.get(0)?.isCompleted)
+        assertEquals(false, viewModel.state.value.procedure?.steps?.get(1)?.isCompleted)
+        assertEquals(false, viewModel.state.value.procedure?.steps?.get(2)?.isCompleted)
+
+        coVerify(exactly = 3) { toggleStepCompletionUseCase(any(), eq(false)) }
     }
 }
