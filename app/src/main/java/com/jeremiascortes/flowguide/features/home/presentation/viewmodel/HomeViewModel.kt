@@ -31,7 +31,6 @@ import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllFoldersBy
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdFolderUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdSpaceUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllSpacesUseCase
-import com.jeremiascortes.flowguide.features.home.domain.usecase.LogoutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -42,7 +41,6 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val logoutUseCase: LogoutUseCase,
     private val getAllSpacesUseCase: GetAllSpacesUseCase,
     private val getAllFoldersByIdSpaceUseCase: GetAllFoldersByIdSpaceUseCase,
     private val getAllProceduresByIdSpaceUseCase: GetAllProceduresByIdSpaceUseCase,
@@ -190,15 +188,6 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    /**
-     * Cierra la sesión del usuario.
-     */
-    fun logout() {
-        viewModelScope.launch {
-            logoutUseCase()
         }
     }
 }

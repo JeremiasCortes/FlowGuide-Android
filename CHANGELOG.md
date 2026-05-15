@@ -14,6 +14,8 @@
 - Selección automática del primer espacio disponible al iniciar la aplicación
 - Tests unitarios `AuthViewModel`
 - Tests unitarios `SettingsViewModel`
+- Tests unitarios `ProcedureViewModel`
+- Tests unitarios `HomeViewModel` 
 
 ### Removed
 - Errores de SonarQube
