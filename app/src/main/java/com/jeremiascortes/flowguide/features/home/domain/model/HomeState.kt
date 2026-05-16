@@ -23,5 +23,13 @@ data class HomeState(
     // Estados de UI
     val isLoading: Boolean = false,
     val error: String? = null,
-    val expandedFolderIds: Set<String> = emptySet()  // IDs de carpetas abiertas
+    val expandedFolderIds: Set<String> = emptySet(),  // IDs de carpetas abiertas
+    val activeDialog: Boolean = false,
+    val dialogType: HomeDialogType? = null
 )
+
+enum class HomeDialogType {
+    CREATE_SPACE,
+    CREATE_FOLDER,
+    CREATE_PROCEDURE
+}

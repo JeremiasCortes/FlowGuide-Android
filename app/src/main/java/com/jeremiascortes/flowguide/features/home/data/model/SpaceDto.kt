@@ -21,17 +21,17 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class SpaceDto(
     @SerialName("id_space")
-    val idSpace: String,
+    val idSpace: String = "",
 
     @SerialName("user_id")
-    val userId: String,
+    val userId: String = "",
 
     val title: String,
-    @SerialName("created_at")
 
-    val createdAt: String,
+    @SerialName("created_at")
+    val createdAt: String = "",
 
     @SerialName("updated_at")
-    val updatedAt: String
+    val updatedAt: String = ""
 )
 

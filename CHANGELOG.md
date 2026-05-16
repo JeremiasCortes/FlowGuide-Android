@@ -15,7 +15,9 @@
 - Tests unitarios `AuthViewModel`
 - Tests unitarios `SettingsViewModel`
 - Tests unitarios `ProcedureViewModel`
-- Tests unitarios `HomeViewModel` 
+- Tests unitarios `HomeViewModel`
+- El usuario puede crear espacios
+- El usuario puede crear carpetas dentro de espacios
 
 ### Removed
 - Errores de SonarQube

@@ -42,9 +42,6 @@ fun SettingScreen(
                     Text(text = if (state.value.isLoading) "Cerrando sesión..." else "Cerrar Sesión")
                 }
             }
-            items(40) {
-                Text(text = "Item $it")
-            }
         }
 
         LoadingIndicator(isLoading = state.value.isLoading)

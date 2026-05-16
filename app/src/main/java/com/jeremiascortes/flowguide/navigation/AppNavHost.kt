@@ -35,8 +35,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -67,26 +66,6 @@ fun AppNavHost() {
     // AuthViewModel compartido: scoped a la Activity para que todas
     // las pantallas de auth compartan la misma instancia y estado
     val authViewModel: AuthViewModel = hiltViewModel()
-
-    val bottomBarItems = remember {
-        listOf(
-            BottomBarItem(
-                icon = Icons.Filled.Check,
-                contentDescription = "Completar",
-                onClick = { /* acción al hacer click */ }
-            ),
-            BottomBarItem(
-                icon = Icons.Filled.Edit,
-                contentDescription = "Editar",
-                onClick = { /* acción al hacer click */ }
-            ),
-            BottomBarItem(
-                icon = Icons.Filled.Settings,
-                contentDescription = "Configuración",
-                onClick = { navController.navigate(AppRoute.Settings.General) }
-            )
-        )
-    }
 
     NavHost(
         navController = navController,
@@ -177,6 +156,20 @@ fun AppNavHost() {
 
         composable<AppRoute.Main.Home> {
             val homeViewModel: HomeViewModel = hiltViewModel()
+            val bottomBarItems = remember(homeViewModel) {
+                listOf(
+                    BottomBarItem(
+                        icon = Icons.Filled.Add,
+                        contentDescription = "Crear carpeta",
+                        onClick = { homeViewModel.createFolderDialog() }
+                    ),
+                    BottomBarItem(
+                        icon = Icons.Filled.Settings,
+                        contentDescription = "Configuración",
+                        onClick = { navController.navigate(AppRoute.Settings.General) }
+                    )
+                )
+            }
 
             HomeScreen(
                 homeViewModel = homeViewModel,

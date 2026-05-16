@@ -13,4 +13,8 @@ interface HomeRepository {
     suspend fun getAllProceduresByIdSpace(idSpace: String): HomeResult<List<ProcedureDto>>
     suspend fun getAllProceduresByIdFolder(idFolder: String): HomeResult<List<ProcedureDto>>
     suspend fun getAllStepsByIdProcedure(idProcedure: String): HomeResult<List<StepDto>>
+    suspend fun createSpace(nameSpace: String): HomeResult<Unit>
+    suspend fun updateSpace(spaceDto: SpaceDto): HomeResult<Unit>
+    suspend fun deleteSpace(spaceDto: SpaceDto): HomeResult<Unit>
+    suspend fun createFolder(nameFolder: String, spaceId: String): HomeResult<Unit>
 }

@@ -280,4 +280,41 @@ class HomeRepositoryImpl @Inject constructor(
             HomeResult.Error("Error al obtener pasos: ${e.message ?: "Error desconocido"}")
         }
     }
+
+    override suspend fun createSpace(nameSpace: String): HomeResult<Unit> {
+        return try{
+            supabase.supabaseClient
+                .from(TABLE_SPACES)
+                .insert(SpaceDto(
+                    title = nameSpace,
+                    userId = supabase.supabaseClient.auth.currentUserOrNull()?.id ?: ""
+                ))
+            Success(Unit)
+        } catch (e: Exception) {
+            HomeResult.Error("Error al crear espacio: ${e.message ?: "Error desconocido"}")
+        }
+    }
+
+    override suspend fun updateSpace(spaceDto: SpaceDto): HomeResult<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun deleteSpace(spaceDto: SpaceDto): HomeResult<Unit> {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun createFolder(nameFolder: String, spaceId: String): HomeResult<Unit> {
+        return try{
+            supabase.supabaseClient
+                .from(TABLE_FOLDERS)
+                .insert(FolderDto(
+                    title = nameFolder,
+                    userId = supabase.supabaseClient.auth.currentUserOrNull()?.id ?: "",
+                    spaceId = spaceId
+                ))
+            Success(Unit)
+        } catch (e: Exception) {
+            HomeResult.Error("Error al crear carpeta: ${e.message ?: "Error desconocido"}")
+        }
+    }
 }

@@ -1,94 +1,153 @@
 # FlowGuide — Android App
 
-Proyecto personal en desarrollo activo. Android nativo con enfoque en
-arquitectura limpia, código mantenible y buenas prácticas desde el inicio.
+FlowGuide es una aplicación Android nativa desarrollada como proyecto personal para organizar procedimientos, espacios de trabajo y pasos de forma estructurada.
+
+El objetivo principal del proyecto no es solo construir una app funcional, sino practicar y demostrar una arquitectura Android moderna, mantenible y escalable usando Kotlin, Jetpack Compose, Clean Architecture y Supabase.
+
+> Proyecto en desarrollo pausado. Algunas funcionalidades pueden estar incompletas o sujetas a cambios.
 
 ---
 
-## Arquitectura
+## Sobre el proyecto
 
-Clean Architecture con separación estricta en tres capas por feature:
+FlowGuide permite organizar información siguiendo una jerarquía sencilla:
 
-```
-features/
-└── [feature]/
-├── data/        # DTOs, implementaciones de repositorio, fuentes de datos
-├── domain/      # Modelos, interfaces, casos de uso
-└── presentation/# ViewModels, Screens, componentes UI
-```
+Espacios de trabajo → Carpetas → Tareas/Procedimientos → Pasos
 
-Cada feature es autónoma. Las capas se comunican hacia adentro:
-`presentation → domain ← data`. El dominio no sabe nada de Supabase,
-Hilt ni Compose.
+La idea es que un usuario pueda crear espacios, agrupar procedimientos en carpetas y consultar pasos de manera ordenada, incluyendo estados de completado.
+
+Aunque es un proyecto personal, está planteado con una estructura cercana a una aplicación real: separación por features, capas bien definidas, gestión de estado, navegación type-safe y comunicación con backend.
 
 ---
 
-## Stack
+## Objetivos técnicos
 
-| Capa | Tecnología |
+Este proyecto está pensado como una muestra práctica de:
+
+- Desarrollo Android nativo con Kotlin
+- UI declarativa con Jetpack Compose
+- Arquitectura limpia por features
+- Separación entre capas `data`, `domain` y `presentation`
+- Gestión de estado con ViewModels y StateFlow
+- Inyección de dependencias con Hilt
+- Navegación type-safe con Navigation Compose
+- Integración con Supabase para autenticación y persistencia
+- Uso de patrones orientados a mantenibilidad y testabilidad
+
+---
+
+## Stack técnico
+
+| Área | Tecnología |
 |------|------------|
-| UI | Jetpack Compose + Material 3 |
+| Lenguaje | Kotlin 2.x |
+| UI | Jetpack Compose |
+| Diseño | Material 3 |
 | Arquitectura | MVVM + Clean Architecture |
-| DI | Hilt (Dagger) |
-| Navegación | Navigation Compose — rutas type-safe con `@Serializable` |
-| Backend | Supabase (Auth, Postgrest, Realtime) |
+| DI | Hilt / Dagger |
+| Navegación | Navigation Compose |
+| Backend | Supabase Auth + PostgREST |
 | Networking | Ktor + OkHttp |
 | Animaciones | Lottie |
-| Lenguaje | Kotlin 2.x |
+| Build | Gradle Kotlin DSL |
+
+---
+
+## Features implementadas
+
+### Auth
+
+- Login y registro con email y contraseña
+- Inicio de sesión con Google OAuth
+- Gestión de sesión
+- Deep links para retorno de autenticación
+
+### Home
+
+- Visualización jerárquica de espacios, carpetas y procedimientos
+- Carga lazy por niveles
+- Expansión y colapso de elementos
+- Creación de espacios y carpetas
+
+### Procedure
+
+- Visualización de pasos de un procedimiento
+- Soporte para pasos anidados
+- Marcado de pasos como completados
+- Persistencia del estado en Supabase
+
+### Settings
+
+- Cierre de sesión
+- Limpieza del back stack tras logout
 
 ---
 
 ## Decisiones técnicas destacadas
 
-**Navegación type-safe**
-Rutas definidas como `sealed class` con `@Serializable`. Sin strings
-mágicos, sin crashes en tiempo de ejecución por argumentos mal tipados.
+### Navegación type-safe
 
-**Eventos de navegación con `Channel`**
-Los ViewModels emiten eventos de navegación a través de `Channel<T>` en
-lugar de `StateFlow`. Evita condiciones de carrera donde la UI procesa
-un evento de navegación que ya no debería estar activo.
+Las rutas están modeladas evitando strings mágicos y reduciendo errores en tiempo de ejecución relacionados con argumentos mal tipados.
 
-**`withProcedure {}` helper**
-Función privada en `ProcedureViewModel` que encapsula el null-check del
-estado actual antes de ejecutar cualquier operación. Reduce código
-duplicado y hace explícita la precondición.
+### Estado de UI centralizado
 
-**Estado de UI como data class**
-Cada feature tiene su propio `XState` que agrupa todo el estado de la
-pantalla. Un único `StateFlow<XState>` en lugar de múltiples flows
-independientes.
+Cada pantalla trabaja con un estado propio representado mediante una data class. Esto permite tener una única fuente de verdad para la UI y simplifica el mantenimiento.
 
-**`rememberUpdatedState` para callbacks**
-Usado en componentes con `AndroidView` para evitar que callbacks
-capturados en closures queden desactualizados entre recomposiciones.
+### Eventos one-shot para navegación
+
+Los eventos de navegación se gestionan de forma separada al estado de pantalla, evitando que acciones puntuales se reprocesen tras recomposiciones o cambios de configuración.
+
+### Features autónomas
+
+Cada feature agrupa sus propias capas de datos, dominio y presentación. Esto facilita escalar el proyecto sin convertir la estructura en una carpeta gigante de clases mezcladas.
+
+### Backend desacoplado del dominio
+
+Supabase se utiliza como backend, pero los detalles de implementación quedan aislados en la capa `data`. La lógica de dominio trabaja con interfaces y modelos propios.
 
 ---
 
-## Estructura de features implementadas
+## Estado actual
 
-- **Auth** — login/registro con email·contraseña + Google OAuth, gestión
-  de sesión con deep links (`flowguide://login`)
-- **Home** — navegación jerárquica Spaces → Folders → Procedures con
-  expansión animada y carga lazy por nivel
-- **Procedure** — visualización de pasos con `TreeCheckbox` (soporte para
-  subnodos), marcado de completado con persistencia en Supabase
-- **Settings** — logout con navegación limpia del back stack
+El proyecto se encuentra en desarrollo y todavía hay áreas por mejorar, entre ellas:
+
+- Cobertura de tests
+- Validaciones de formularios más completas
+- Mejor manejo de errores globales
+- Pulido visual de algunas pantallas
+- Mejoras de accesibilidad
+- Refactorización de algunos componentes reutilizables
+
+---
+
+## Qué demuestra este proyecto
+
+Este repositorio puede servir como ejemplo de mi forma de trabajar en Android:
+
+- Organización del código desde fases tempranas
+- Interés por escribir código mantenible
+- Uso de herramientas modernas del ecosistema Android
+- Separación clara de responsabilidades
+- Aprendizaje práctico aplicado a un proyecto real
+
+No pretende ser una aplicación terminada ni un producto comercial, sino una muestra honesta de desarrollo Android en progreso.
 
 ---
 
 ## Changelog
 
-El proyecto mantiene un [CHANGELOG.md](CHANGELOG.md) con historial de cambios y versiones.
+El proyecto mantiene un historial de cambios en [CHANGELOG.md](CHANGELOG.md).
 
 ---
 
 ## Autor
 
 **Jeremías Cortés**
-[linkedin.com/in/jeremias-cortes](https://linkedin.com/in/jeremias-cortes) ·
-[jeremiasacortes@gmail.com](mailto:jeremiasacortes@gmail.com)
+
+[LinkedIn](https://linkedin.com/in/jeremias-cortes) · [Email](mailto:jeremiasacortes@gmail.com)
 
 ---
 
-*Código visible con derechos reservados. Ver [LICENSE.md](LICENSE.md).*
+## Licencia
+
+Código visible con derechos reservados. Ver [LICENSE.md](LICENSE.md).

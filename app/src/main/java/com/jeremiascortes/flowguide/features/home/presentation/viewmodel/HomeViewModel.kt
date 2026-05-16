@@ -25,8 +25,12 @@ package com.jeremiascortes.flowguide.features.home.presentation.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jeremiascortes.flowguide.features.home.data.model.SpaceDto
+import com.jeremiascortes.flowguide.features.home.domain.model.HomeDialogType
 import com.jeremiascortes.flowguide.features.home.domain.model.HomeResult
 import com.jeremiascortes.flowguide.features.home.domain.model.HomeState
+import com.jeremiascortes.flowguide.features.home.domain.usecase.CreateFolderUseCase
+import com.jeremiascortes.flowguide.features.home.domain.usecase.CreateSpaceUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllFoldersByIdSpaceUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdFolderUseCase
 import com.jeremiascortes.flowguide.features.home.domain.usecase.GetAllProceduresByIdSpaceUseCase
@@ -45,6 +49,8 @@ class HomeViewModel @Inject constructor(
     private val getAllFoldersByIdSpaceUseCase: GetAllFoldersByIdSpaceUseCase,
     private val getAllProceduresByIdSpaceUseCase: GetAllProceduresByIdSpaceUseCase,
     private val getAllProceduresByIdFolderUseCase: GetAllProceduresByIdFolderUseCase,
+    private val createSpaceUseCase: CreateSpaceUseCase,
+    private val createFolderUseCase: CreateFolderUseCase,
 ) : ViewModel() {
 
     // Backing property: MutableStateFlow privado (solo el ViewModel puede escribir)
@@ -68,9 +74,16 @@ class HomeViewModel @Inject constructor(
                 is HomeResult.Loading -> Unit
 
                 is HomeResult.Success -> {
+
                     _state.value = _state.value.copy(
                         isLoading = false,
-                        spaces = result.data
+                        spaces = result.data + SpaceDto(
+                            idSpace = "CrearSpace",
+                            title = "+ Crear un espacio...",
+                            userId = "CrearSpace",
+                            createdAt = "",
+                            updatedAt = ""
+                        )
                     )
 
                     // Seleccionamos automáticamente el primer espacio disponible
@@ -86,32 +99,6 @@ class HomeViewModel @Inject constructor(
                     )
                 }
             }
-        }
-    }
-
-    fun loadProcedures(idSpace: String) {
-        viewModelScope.launch {
-            _state.value = _state.value.copy(isLoading = true)
-
-            when (val result = getAllProceduresByIdSpaceUseCase(idSpace)) {
-                // El loading ya se maneja al inicio, no se requiere acción adicional
-                is HomeResult.Loading -> Unit
-
-                is HomeResult.Success -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        orphanProceduresBySpace = mapOf(idSpace to result.data)
-                    )
-                }
-
-                is HomeResult.Error -> {
-                    _state.value = _state.value.copy(
-                        isLoading = false,
-                        error = result.message
-                    )
-                }
-            }
-
         }
     }
 
@@ -189,5 +176,84 @@ class HomeViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    fun showDialog() {
+        _state.value = state.value.copy(
+            activeDialog = true
+        )
+    }
+
+    fun closeDialog() {
+        _state.value = state.value.copy(
+            activeDialog = false,
+            dialogType = null
+        )
+    }
+
+    fun createSpaceDialog() {
+        showDialog()
+        _state.value = state.value.copy(
+            dialogType = HomeDialogType.CREATE_SPACE
+        )
+    }
+
+    fun createSpace(nameSpace: String) {
+        closeDialog()
+        viewModelScope.launch {
+            when (val result = createSpaceUseCase(nameSpace)) {
+                is HomeResult.Success -> {
+                    loadSpaces()
+                }
+
+                is HomeResult.Error -> {
+                    TODO()
+                }
+
+                HomeResult.Loading -> {
+                    TODO()
+                }
+            }
+        }
+    }
+
+    fun createFolderDialog() {
+        showDialog()
+        _state.value = state.value.copy(
+            dialogType = HomeDialogType.CREATE_FOLDER
+        )
+    }
+
+    fun createFolder(nameFolder: String, spaceId: String) {
+        closeDialog()
+        viewModelScope.launch {
+            when (val result = createFolderUseCase(
+                nameFolder = nameFolder,
+                spaceId = spaceId
+            )) {
+                is HomeResult.Success -> {
+                    selectSpace(spaceId)
+                }
+
+                is HomeResult.Error -> {
+                    TODO()
+                }
+
+                HomeResult.Loading -> {
+                    TODO()
+                }
+            }
+        }
+    }
+
+    fun createProcedureDialog() {
+        showDialog()
+        _state.value = state.value.copy(
+            dialogType = HomeDialogType.CREATE_PROCEDURE
+        )
+    }
+
+    fun createProcedure() {
+        closeDialog()
     }
 }

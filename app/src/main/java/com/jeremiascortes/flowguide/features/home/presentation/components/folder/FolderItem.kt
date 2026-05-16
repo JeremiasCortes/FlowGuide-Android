@@ -2,9 +2,9 @@ package com.jeremiascortes.flowguide.features.home.presentation.components.folde
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,7 +18,6 @@ import androidx.compose.material.icons.filled.ExpandLess
 import androidx.compose.material.icons.filled.ExpandMore
 import androidx.compose.material.icons.filled.Folder
 import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgeDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -28,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-
 import com.jeremiascortes.flowguide.features.home.data.model.FolderDto
 import com.jeremiascortes.flowguide.features.home.data.model.ProcedureDto
 import com.jeremiascortes.flowguide.features.home.presentation.components.formatAsRelativeTime
@@ -39,7 +37,8 @@ fun FolderItem(
     isExpanded: Boolean,
     procedures: List<ProcedureDto>,
     onToggle: () -> Unit,
-    onNavigateToProcedure: (String) -> Unit
+    onNavigateToProcedure: (String) -> Unit,
+    newProcedure: () -> Unit
 ) {
     Card(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
@@ -114,6 +113,15 @@ fun FolderItem(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(vertical = 8.dp)
                         )
+
+                        ProcedureItem(
+                            procedure = ProcedureDto(
+                                userId = folder.userId,
+                                title = "Añadir procedimiento",
+                                idSpace = folder.spaceId
+                            ),
+                            onClick = newProcedure
+                        )
                     } else {
                         procedures.forEach { procedure ->
                             ProcedureItem(
@@ -123,6 +131,15 @@ fun FolderItem(
                                 }
                             )
                         }
+
+                        ProcedureItem(
+                            procedure = ProcedureDto(
+                                userId = folder.userId,
+                                title = "Añadir procedimiento",
+                                idSpace = folder.spaceId
+                            ),
+                            onClick = newProcedure
+                        )
                     }
                 }
             }

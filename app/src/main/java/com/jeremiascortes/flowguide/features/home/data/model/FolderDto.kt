@@ -7,13 +7,13 @@ import kotlinx.serialization.Serializable
 data class FolderDto(
 
     @SerialName("id_folder")
-    val idFolder: String,
+    val idFolder: String = "",
 
     @SerialName("created_at")
-    val createdAt: String,
+    val createdAt: String = "",
 
     @SerialName("updated_at")
-    val updatedAt: String,
+    val updatedAt: String = "",
 
     @SerialName("user_id")
     val userId: String,
